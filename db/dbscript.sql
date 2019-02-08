@@ -1,4 +1,4 @@
-#drop  database bughound;
+drop  database bughound;
 #drop table Attachment;
 #drop table BugReport;
 #drop table Program;
@@ -15,8 +15,10 @@ create table FunctionalArea(
 
 create table Employee(
     employeeId int(10) not null auto_increment,
-    firstName varchar(40) not null,
-    lastName varchar(40) not null,
+    name varchar(40) not null,
+    username varchar(40) not null,
+    password varchar(40) not null,
+    level int(1) not null,
     area varchar(40) not null,
     primary key (employeeID),
     foreign key (area) references FunctionalArea(areaName)  
@@ -72,11 +74,17 @@ insert into FunctionalArea values('User Interface');
 insert into FunctionalArea values('Back-end');
 insert into FunctionalArea values('Software');
 
-insert into Employee values(null,'Tony', 'Martinez', 'Software');
-insert into Employee values(null, 'Archer', 'Mill', 'Software');
+insert into Employee values(null,'Tony Martinez', 'tony','password', 1, 'Software');
+insert into Employee values(null, 'Archer Mill','archer','password', 2,  'Software');
+insert into Employee values(null,'Jessica Martinez', 'jess','password', 1, 'Software');
+insert into Employee values(null, 'John House','john','password', 2,  'Software');
+
 
 insert into Program values(null,'Space Fighter', '1','1','Galactic Fighter');
 insert into Program values(null,'Street Fighter', '1','1','2d console fighter');
+
+
+
 
 
 
