@@ -37,16 +37,6 @@
     {% endif %}
   </div>
   <div class="input-group">
-    {{ form.confirm(placeholder="confirm password") }}
-    {% if form.confirm.errors %}
-      <span class="error">
-        {% for error in form.confirm.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-   <div class="input-group">
     {{ form.userLevel(placeholder="userLevel") }}
     {% if form.userLevel.errors %}
       <span class="error">
@@ -56,6 +46,7 @@
       </span>
     {% endif %}
   </div>
+
   <button class="btn btn-sm btn-success" type="submit">Add new Employee</button>
   <br>
 </form>

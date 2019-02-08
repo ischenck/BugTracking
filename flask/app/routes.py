@@ -1,7 +1,8 @@
-from flask import render_template, flash, redirect, url_for, jsonify
+from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from app import app
-from app.forms import EditForm
+from app.forms import EditForm, RegisterForm
 from flaskext.mysql import MySQL
+from functools import wraps
 
 mysql = MySQL()
  
@@ -11,10 +12,6 @@ app.config['MYSQL_DATABASE_PASSWORD'] = '1234'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
-
-
-#db = pymysql.connect("localhost", "root", "system", "bughound")
-
 
 @app.route('/')
 @app.route('/index')
@@ -30,10 +27,6 @@ def index():
             'body': 'The Avengers movie was so cool!'
         }
     ]
-    
-    
-    
-    
     return render_template('index.html', title='Home', user=user, posts=posts)
 
 
@@ -59,24 +52,38 @@ def select():
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
     form = EditForm()
-    
-    cursor = mysql.connect().cursor()
+    con = mysql.connect()
+    cursor = con.cursor()
     sql = "select * from Employee where employeeId="+str(id)
     cursor.execute(sql)
     results = cursor.fetchone()
-#    employeeString = 'Employee ID:'+str(results[0]) + ' Name: '+results[1]
+    #    employeeString = 'Employee ID:'+str(results[0]) + ' Name: '+results[1]
     employeeString = results
-    
-    form.name.data = results[1]
-    form.username.data = results[2]
-    form.password.data = results[3]
-    form.userLevel.data = results[4]
-    if form.validate_on_submit():
-        print('redirect on submit')
-        sql = "update Employee set name="+str(form.name.data)+" ,username="+str(form.username.data)+", password="+str(form.password.data)+", level="+str(form.userLevel.data)+" where employeeId="+str(results[0])+";"
-        #this needs some catch and redirect if error
-        cursor.execute(sql)   
+    if request.method == 'GET':      
+        form.name.data = results[1]
+        form.username.data = results[2]
+        form.password.data = ""
+        form.userLevel.data = results[4]
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            print('redirect on submit')
+            editedEmployee = (
+                str(form.name.data), 
+                str(form.username.data), 
+                str(form.password.data), 
+                str(form.userLevel.data),)
+            try:
+                sql = "UPDATE Employee SET name=%s, username=%s, password=%s, level=%s WHERE employeeId="+str(id)
+                cursor.execute(sql, editedEmployee)
+                con.commit()
+                flash('Employee information updated.')
                 return redirect(url_for('select'))
+            except Exception as e:
+                flash("Problem editing Employee in db: " + str(e))
+                return redirect(url_for('select'))
+            #sql = "update Employee set name="+str(form.name.data)+" ,username="+str(form.username.data)+", password="+str(form.password.data)+", level="+str(form.userLevel.data)+" where employeeId="+str(results[0])+";"
+            #this needs some catch and redirect if error
+            #cursor.execute(sql)   
     
     return render_template('edit.html', results=employeeString, form=form)
 
@@ -86,21 +93,26 @@ def register():
     form = RegisterForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
-            new_employee = [
-                form.name.data,
-                form.username.data,
-                bcrypt.generate_password_hash(form.password.data),
-                form.userLevel.data
-            ]
+            con = mysql.connect()
+            cursor = con.cursor()
+            area = "Software"
+            newEmployee = (
+                str(form.name.data), 
+                str(form.username.data), 
+                str(form.password.data), 
+                str(form.userLevel.data), 
+                area,
+                )
             try:
-                cursor = mysql.connect().cursor()
-                sql = "INSERT INTO `Employee` VALUES (null, %s, %s, %s, %s)"
-                cursor.execute(sql, (new_employee[0], new_employee[1], new_employee[2], new_employee[4]))
+                sql = "INSERT INTO Employee (name, username, password, level, area) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(sql, newEmployee)
+                con.commit()
                 flash('New employee added.')
-                return redirect('/index/')
-            except IntegrityError:
-                error = 'That Employee already exists.'
-                return render_template('register.html', form=form, error=error)
+                return redirect(url_for('register'))
+            except Exception as e:
+                flash("Problem inserting into db: " + str(e))
+                return redirect(url_for('register'))
+
     return render_template('register.html', form=form, error=error)
 
 
@@ -108,14 +120,6 @@ def register():
 @app.route('/editEmployee/<guest>')
 def hello_guest(guest):
    return 'Hello %s as Guest' % guest
-
-
-
-
-
-
-
-
 
 
 
