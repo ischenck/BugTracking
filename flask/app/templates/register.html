@@ -1,10 +1,11 @@
+
+
 {% extends "base.html" %}
 
 {% block content %}
  
-  <h3>View Edit Employee {{results[0]}}</h1>
-  <form action="" method="post" novalidate>
-   {{ form.csrf_token }}
+ <form method="POST" action="/register/">
+  {{ form.csrf_token }}
   <div class="input-group">
     {{ form.name(placeholder="name") }}
     {% if form.name.errors %}
@@ -46,7 +47,7 @@
     {% endif %}
   </div>
 
-  <button class="btn btn-sm btn-success" type="submit">Edit Employee</button>
+  <button class="btn btn-sm btn-success" type="submit">Add new Employee</button>
   <br>
 </form>
 

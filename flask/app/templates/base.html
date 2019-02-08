@@ -1,15 +1,17 @@
 <html>
     <head>
         {% if title %}
-        <title>{{ title }} - Microblog</title>
+        <title>{{ title }} - BugHound</title>
         {% else %}
-        <title>Welcome to Microblog</title>
+        <title>Welcome to BugHound</title>
         {% endif %}
     </head>
     <body>
         <div>
             Bug Hound:
-            <a href="{{ url_for('index') }}">Home</a>    <a href="{{ url_for('select') }}">Edit Employees</a>
+            <a href="{{ url_for('index') }}">Home</a> 
+            <a href="{{ url_for('register') }}">Add Employees</a>
+            <a href="{{ url_for('select') }}">Edit Employees</a>
             
         </div>
        
