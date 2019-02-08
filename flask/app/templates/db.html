@@ -1,0 +1,23 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+ 
+<div>
+<table>
+{% for row in results %}
+      
+      <tr>
+         <td>{{ row }}</td>        
+      </tr>
+      
+{% endfor %}
+</table>
+</div>
+
+
+{% endblock %}
+
+
+    
