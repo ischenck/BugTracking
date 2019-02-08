@@ -1,0 +1,64 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+ 
+ <form method="POST" action="/register/">
+  {{ form.csrf_token }}
+  <div class="input-group">
+    {{ form.name(placeholder="name") }}
+    {% if form.name.errors %}
+      <span class="error">
+        {% for error in form.name.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <div class="input-group">
+    {{ form.username(placeholder="username") }}
+    {% if form.username.errors %}
+      <span class="error">
+        {% for error in form.username.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <div class="input-group">
+    {{ form.password(placeholder="password") }}
+    {% if form.password.errors %}
+      <span class="error">
+        {% for error in form.password.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <div class="input-group">
+    {{ form.confirm(placeholder="confirm password") }}
+    {% if form.confirm.errors %}
+      <span class="error">
+        {% for error in form.confirm.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+   <div class="input-group">
+    {{ form.userLevel(placeholder="userLevel") }}
+    {% if form.userLevel.errors %}
+      <span class="error">
+        {% for error in form.userLevel.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <button class="btn btn-sm btn-success" type="submit">Add new Employee</button>
+  <br>
+</form>
+
+
+{% endblock %}
