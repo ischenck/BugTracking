@@ -1,5 +1,6 @@
 # Current:
 
-List all employees with and edit link is completed
-Show an employee on a form to update is completed
+List of all employees with and edit link is completed
+Update form is completed
+DB with updated Employeed table is complted
 Update on employee not currently working.
