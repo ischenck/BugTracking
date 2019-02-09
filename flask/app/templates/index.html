@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
+
+
 {% block content %}
-    <h1>Hi, {{ user.username }}, welcome to BugHound!</h1>
-    {% for post in posts %}
-    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %}
+<div class="jumbotron">
+  <h1>Welcom to Bug Hound!</h1>
+</div>
 {% endblock %}
+
