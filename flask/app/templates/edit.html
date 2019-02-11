@@ -2,9 +2,11 @@
 
 {% block content %}
  
-  <h3>View Edit Employee {{results[0]}}</h1>
+ <div class="container">
+  <h3>View Edit Employee {{results[0]}}</h3>
   <form action="" method="post" novalidate>
    {{ form.csrf_token }}
+   <label for="name">Name:</label>
   <div class="input-group">
     {{ form.name(placeholder="name") }}
     {% if form.name.errors %}
@@ -15,6 +17,8 @@
       </span>
     {% endif %}
   </div>
+  <br>
+  <label for"username">Username:</label>
   <div class="input-group">
     {{ form.username(placeholder="username") }}
     {% if form.username.errors %}
@@ -25,6 +29,8 @@
       </span>
     {% endif %}
   </div>
+  <br>
+  <label for="password">Password:</label>
   <div class="input-group">
     {{ form.password(placeholder="password") }}
     {% if form.password.errors %}
@@ -35,6 +41,8 @@
       </span>
     {% endif %}
   </div>
+  <br>
+  <label for="userLevel">User Level:</label>
   <div class="input-group">
     {{ form.userLevel(placeholder="userLevel") }}
     {% if form.userLevel.errors %}
@@ -45,10 +53,13 @@
       </span>
     {% endif %}
   </div>
+  <br>
 
   <button class="btn btn-sm btn-success" type="submit">Edit Employee</button>
   <br>
 </form>
+
+</div>
 
 
 {% endblock %}

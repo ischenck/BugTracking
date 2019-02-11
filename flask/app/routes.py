@@ -8,7 +8,7 @@ mysql = MySQL()
  
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
+app.config['MYSQL_DATABASE_PASSWORD'] = '1234'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -91,10 +91,17 @@ def edit(id):
 def register():
     error = None
     form = RegisterForm(request.form)
-    if request.method == 'POST':
+    con = mysql.connect()
+    cursor = con.cursor()
+    if request.method == 'GET':
+        sql = "SELECT * FROM FunctionalArea"
+        cursor.execute(sql)
+        areas = cursor.fetchall()
+        areas_list=[(i, i) for i in areas]
+        form.functionalArea.choices = areas_list
+    elif request.method == 'POST':
         if form.validate_on_submit():
-            con = mysql.connect()
-            cursor = con.cursor()
+ 
             area = "Software"
             newEmployee = (
                 str(form.name.data), 
@@ -108,7 +115,7 @@ def register():
                 cursor.execute(sql, newEmployee)
                 con.commit()
                 flash('New employee added.')
-                return redirect(url_for('register'))
+                return redirect(url_for('select'))
             except Exception as e:
                 flash("Problem inserting into db: " + str(e))
                 return redirect(url_for('register'))
