@@ -8,7 +8,7 @@ mysql = MySQL()
  
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = '1234'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -54,36 +54,48 @@ def edit(id):
     form = EditForm()
     con = mysql.connect()
     cursor = con.cursor()
+
     sql = "select * from Employee where employeeId="+str(id)
     cursor.execute(sql)
     results = cursor.fetchone()
-    #    employeeString = 'Employee ID:'+str(results[0]) + ' Name: '+results[1]
     employeeString = results
+
+    sql = "SELECT * FROM FunctionalArea"
+    cursor.execute(sql)
+    functionalAreaResults = list(cursor.fetchall())
+    areas = [i[0] for i in functionalAreaResults]
+
+    # put employee's current functional area on top of list
+    print(areas)
+    areas.insert(0, areas.pop(areas.index(results[5])))
+    # make list of tuples to pass to wtf-form's SelectField (value, display)
+    areas_list=[(i, i) for i in areas]
+
     if request.method == 'GET':      
         form.name.data = results[1]
         form.username.data = results[2]
         form.password.data = ""
         form.userLevel.data = results[4]
+        form.functionalArea.choices = areas_list
     elif request.method == 'POST':
+        form.functionalArea.choices = areas_list
         if form.validate_on_submit():
             print('redirect on submit')
             editedEmployee = (
                 str(form.name.data), 
                 str(form.username.data), 
                 str(form.password.data), 
-                str(form.userLevel.data),)
+                str(form.userLevel.data),
+                str(form.functionalArea.data),)
             try:
-                sql = "UPDATE Employee SET name=%s, username=%s, password=%s, level=%s WHERE employeeId="+str(id)
+                sql = "UPDATE Employee SET name=%s, username=%s, password=%s, level=%s, area=%s WHERE employeeId="+str(id)
                 cursor.execute(sql, editedEmployee)
                 con.commit()
                 flash('Employee information updated.')
                 return redirect(url_for('select'))
             except Exception as e:
-                flash("Problem editing Employee in db: " + str(e))
+                print("Problem editing Employee in db: " + str(e))
                 return redirect(url_for('select'))
-            #sql = "update Employee set name="+str(form.name.data)+" ,username="+str(form.username.data)+", password="+str(form.password.data)+", level="+str(form.userLevel.data)+" where employeeId="+str(results[0])+";"
-            #this needs some catch and redirect if error
-            #cursor.execute(sql)   
     
     return render_template('edit.html', results=employeeString, form=form)
 
@@ -93,22 +105,21 @@ def register():
     form = RegisterForm(request.form)
     con = mysql.connect()
     cursor = con.cursor()
-    if request.method == 'GET':
-        sql = "SELECT * FROM FunctionalArea"
-        cursor.execute(sql)
-        areas = cursor.fetchall()
-        areas_list=[(i, i) for i in areas]
+    sql = "SELECT * FROM FunctionalArea"
+    cursor.execute(sql)
+    areas = cursor.fetchall()
+    areas_list=[(str(i[0]), str(i[0])) for i in areas]
+    form.functionalArea.choices = areas_list
+    if request.method == 'POST':
         form.functionalArea.choices = areas_list
-    elif request.method == 'POST':
         if form.validate_on_submit():
- 
             area = "Software"
             newEmployee = (
                 str(form.name.data), 
                 str(form.username.data), 
                 str(form.password.data), 
                 str(form.userLevel.data), 
-                area,
+                str(form.functionalArea.data),
                 )
             try:
                 sql = "INSERT INTO Employee (name, username, password, level, area) VALUES (%s, %s, %s, %s, %s)"
