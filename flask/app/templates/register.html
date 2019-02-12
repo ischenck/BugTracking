@@ -1,10 +1,15 @@
 {% extends "base.html" %}
-
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block content %}
  
+<div class="container">
+<div class="row align-items center justify-content-center">
+<div class="col-md-4">
+<h3>Add New Employee</h3>
 <div class="form-group">
- <form method="POST" action="/register/">
+ <form method="POST" action="/register/" role="form">
   {{ form.csrf_token }}
+     <label for="name">Name:</label>
   <div class="input-group">
     {{ form.name(placeholder="name") }}
     {% if form.name.errors %}
@@ -15,6 +20,8 @@
       </span>
     {% endif %}
   </div>
+  <br>
+    <label for"username">Username:</label>
   <div class="input-group">
     {{ form.username(placeholder="username") }}
     {% if form.username.errors %}
@@ -25,6 +32,9 @@
       </span>
     {% endif %}
   </div>
+  <br>
+    <label for="password">Password:</label>
+
   <div class="input-group">
     {{ form.password(placeholder="password") }}
     {% if form.password.errors %}
@@ -35,6 +45,8 @@
       </span>
     {% endif %}
   </div>
+  <br>
+    <label for="userLevel">User Level:</label>
   <div class="input-group">
     {{ form.userLevel(placeholder="userLevel") }}
     {% if form.userLevel.errors %}
@@ -45,10 +57,26 @@
       </span>
     {% endif %}
   </div>
+  <br>
+  <label for="functionalArea">Functional Area:</label>
+  <div class="input-group">
+    {{ form.functionalArea(placeholder="functionalArea") }}
+    {% if form.functionalArea.errors %}
+      <span class="error">
+        {% for error in form.userLevel.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <br>
 
-  <button class="btn btn-sm btn-success" type="submit">Add new Employee</button>
+   <button class="btn btn-sm btn-success" type="submit">Add new Employee</button>
   <br>
 </form>
+</div>
+</div>
+</div>
 </div>
 
 
