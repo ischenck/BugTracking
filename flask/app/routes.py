@@ -113,7 +113,6 @@ def register():
     if request.method == 'POST':
         form.functionalArea.choices = areas_list
         if form.validate_on_submit():
-            area = "Software"
             newEmployee = (
                 str(form.name.data), 
                 str(form.username.data), 
@@ -138,6 +137,89 @@ def register():
 @app.route('/editEmployee/<guest>')
 def hello_guest(guest):
    return 'Hello %s as Guest' % guest
+
+
+@app.route('/bugreport/', methods=['GET', 'POST'])
+def bugReport():
+    error = None
+    form = BugReportForm(request.form)
+    con = mysql.connect()
+    cursor = con.cursor()
+    sql = "SELECT * FROM Program"
+    cursor.execute(sql)
+
+    programs = cursor.fetchall()
+    programNames =  [(i[1], i[1]) for i in programs]
+    programVersions = [(i[2], i[2]) for i in programs]
+    programReleaseNumbers = [(i[3], i[3]) for i in programs]
+    form.programName.choices = programs
+    form.programVersion.choices = programVersions
+    form.programReaseNumber.choices = programReleaseNumbers
+
+    sql = "SELECT employeeId, name FROM Employee"
+    cursor.execute(sql)
+
+    employees = cursor.fetchall()
+
+    form.reportedBy.choices = employees
+    form.assignedTo.choices = employees
+    form.resolvedBy.choices = employees
+    form.testedBy.choices = employees
+
+    if request.method == 'POST':
+        form.programName.choices = programs
+        form.programVersion.choices = programVersions
+        form.programReaseNumber.choices = programReleaseNumbers       
+        form.reportedBy.choices = employees
+        form.assignedTo.choices = employees
+        form.resolvedBy.choices = employees
+        form.testedBy.choices = employees
+        if form.validate_on_submit():
+            program = [program for program in programs 
+                if program[1] == form.programName.data and
+                program[2] == form.programVersion.data and
+                program[3] == form.programReleaseNumber.data
+                ]
+            programId = program[0][0]
+            bugReportData = (
+                str(programId),
+                str(form.reportType.data),
+                str(form.severity.data),
+                str(form.summary.data),
+                str(form.reproducable.data),
+                str(form.description.data),
+                str(form.suggestedFix.data),
+                str(form.reportedBy.data),
+                str(form.discoveredData.data),
+                str(form.assignedTo.data),
+                str(form.comments.data),
+                str(form.status.data),
+                str(form.priority.data),
+                str(form.resolution.data),
+                str(form.resolutionVersion.data),
+                str(form.resolvedBy.data),
+                str(form.resolvedDate.data),
+                str(form.testedBy.data),
+                str(form.testedDate.data),
+                str(form.deferred.data)
+                )
+            try:
+                sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
+                    reproducable, description, suggestedFix, reportedBy, discoveredDate, \
+                    assignedTo, comments, status, priority, resolution, \
+                    resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, deferred) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+                cursor.execute(sql, BugReportData)
+                con.commit()
+                flash('New Bug Report added')
+                return redirect(url_for('bugreport'))
+            except Exception as e:
+                flash("Problem inserting into db: " + str(e))
+                return redirect(url_for('bugreport'))
+            
+            return render_template('bugreport.html', form=form, error=error)
+
 
 
 
