@@ -6,13 +6,13 @@
 <div class="col-md-4">
 <h3>Add New Bug Report</h3>
 <div class="form-group">
- <form method="POST" action="/bugreport/" role="form">
+ <form method="POST" action="/bug_report/" role="form">
   {{ form.csrf_token }}
 
-     <label for="programName">Program Name:</label>
+  <label for="programName">Program Name:</label>
   <div class="input-group">
     {{ form.programName(placeholder="programName") }}
-    {% if form.name.errors %}
+    {% if form.programName.errors %}
       <span class="error">
         {% for error in form.programName.errors %}
           {{ error }}

@@ -139,8 +139,8 @@ def hello_guest(guest):
    return 'Hello %s as Guest' % guest
 
 
-@app.route('/bugreport/', methods=['GET', 'POST'])
-def bugReport():
+@app.route('/bug_report/', methods=['GET', 'POST'])
+def bug_report():
     error = None
     form = BugReportForm(request.form)
     con = mysql.connect()
@@ -152,9 +152,9 @@ def bugReport():
     programNames =  [(i[1], i[1]) for i in programs]
     programVersions = [(i[2], i[2]) for i in programs]
     programReleaseNumbers = [(i[3], i[3]) for i in programs]
-    form.programName.choices = programs
+    form.programName.choices = programNames
     form.programVersion.choices = programVersions
-    form.programReaseNumber.choices = programReleaseNumbers
+    form.programReleaseNumber.choices = programReleaseNumbers
 
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
@@ -167,13 +167,13 @@ def bugReport():
     form.testedBy.choices = employees
 
     if request.method == 'POST':
-        form.programName.choices = programs
-        form.programVersion.choices = programVersions
-        form.programReaseNumber.choices = programReleaseNumbers       
-        form.reportedBy.choices = employees
-        form.assignedTo.choices = employees
-        form.resolvedBy.choices = employees
-        form.testedBy.choices = employees
+        #form.programName.choices = programs
+        #form.programVersion.choices = programVersions
+        #form.programReleaseNumber.choices = programReleaseNumbers       
+        #form.reportedBy.choices = employees
+        #form.assignedTo.choices = employees
+        #form.resolvedBy.choices = employees
+        #form.testedBy.choices = employees
         if form.validate_on_submit():
             program = [program for program in programs 
                 if program[1] == form.programName.data and
@@ -213,12 +213,12 @@ def bugReport():
                 cursor.execute(sql, BugReportData)
                 con.commit()
                 flash('New Bug Report added')
-                return redirect(url_for('bugreport'))
+                return redirect(url_for('bug_report'))
             except Exception as e:
                 flash("Problem inserting into db: " + str(e))
-                return redirect(url_for('bugreport'))
+                return redirect(url_for('bug_report'))
             
-            return render_template('bugreport.html', form=form, error=error)
+    return render_template('bug_report.html', form=form, error=error)
 
 
 
