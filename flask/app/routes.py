@@ -149,7 +149,10 @@ def bug_report():
     cursor.execute(sql)
 
     programs = cursor.fetchall()
-    programNames =  [(i[1], i[1]) for i in programs]
+    names = [i[1] for i in programs]
+    nameset = set(names)
+    uniqueNames = list(nameset)
+    programNames =  [(i, i) for i in uniqueNames]
     programVersions = [(i[2], i[2]) for i in programs]
     programReleaseNumbers = [(i[3], i[3]) for i in programs]
     form.programName.choices = programNames
@@ -165,7 +168,8 @@ def bug_report():
     form.assignedTo.choices = employees
     form.resolvedBy.choices = employees
     form.testedBy.choices = employees
-
+    if  request.method == 'GET':
+        return render_template('bug_report.html', form=form, error=error)
     if request.method == 'POST':
         #form.programName.choices = programs
         #form.programVersion.choices = programVersions
@@ -181,16 +185,18 @@ def bug_report():
                 program[3] == form.programReleaseNumber.data
                 ]
             programId = program[0][0]
+            reproducable = int(str(form.reproducable.data) == 'True')
+            deferred = int(str(form.deferred.data) == 'True')
             bugReportData = (
                 str(programId),
                 str(form.reportType.data),
                 str(form.severity.data),
                 str(form.summary.data),
-                str(form.reproducable.data),
+                str(reproducable),
                 str(form.description.data),
                 str(form.suggestedFix.data),
                 str(form.reportedBy.data),
-                str(form.discoveredData.data),
+                str(form.discoveredDate.data),
                 str(form.assignedTo.data),
                 str(form.comments.data),
                 str(form.status.data),
@@ -201,7 +207,7 @@ def bug_report():
                 str(form.resolvedDate.data),
                 str(form.testedBy.data),
                 str(form.testedDate.data),
-                str(form.deferred.data)
+                str(deferred)
                 )
             try:
                 sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
@@ -210,16 +216,28 @@ def bug_report():
                     resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, deferred) \
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-                cursor.execute(sql, BugReportData)
+                cursor.execute(sql, bugReportData)
                 con.commit()
-                flash('New Bug Report added')
+                print('New Bug Report added')
                 return redirect(url_for('bug_report'))
             except Exception as e:
-                flash("Problem inserting into db: " + str(e))
+                print("Problem inserting into db: " + str(e))
                 return redirect(url_for('bug_report'))
             
     return render_template('bug_report.html', form=form, error=error)
 
+
+@app.route('/_get_program_info/')
+def _get_program_info():
+    programName = request.args.get('programName', type=str)
+    print(programName)
+    con = mysql.connect()
+    cursor = con.cursor()
+    sql = "SELECT version, releaseNumber FROM Program WHERE name = %s"
+    cursor.execute(sql, str(programName))
+    info = cursor.fetchall()
+    print(info)
+    return jsonify(info)
 
 
 

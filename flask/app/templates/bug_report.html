@@ -1,6 +1,53 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script charset="utf-8", type="text/javascript">
+  $(function(){
+
+     var dropdown = {
+       programName: $('program_name'),
+       programVersion: $('program_version'),
+       programReleaseNumber: $('program_release_number')
+     };
+
+     updateProgram();
+
+     function updateProgram() {
+       var send = {
+         programName: dropdown.programName.val()
+       };
+       dropdown.programVersion.attr('disabled', 'disabled');
+       dropdown.programVersion.empty();
+       dropdown.programReleaseNumber.attr('disabled', 'disabled');
+       dropdown.programReleaseNumber.empty();
+       $.getJSON("{{ url_for('_get_program_info') }}", send, function(data) {
+         data.forEach(function(item) {
+           dropdown.programVersion.append(
+             $('<option>', {
+               value: item[0],
+               text: item[0]
+             })
+           );
+           dropdown.programReleaseNumber.append(
+             $('<option>', {
+               value: item[1],
+               text: item[1]
+             })
+           );            
+         });
+         dropdown.programVersion.removeAttr('disabled');
+         dropdown.programReleaseNumber.removeAttr('disabled');
+       });    
+     }
+
+     dropdown.programName.on('change', function() {
+       updateProgram();
+     });
+   });
+
+  </script>
+
 <div class="container">
 <div class="row align-items center justify-content-center">
 <div class="col-md-4">

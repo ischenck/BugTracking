@@ -13,20 +13,20 @@ from datetime import date
 
 
 class BugReportForm(FlaskForm):
-    programName = SelectField('Program', validators=[InputRequired()]
+    programName = SelectField('Program', validators=[InputRequired()], id='program_name'
         )
-    programVersion = SelectField('Version', validators=[InputRequired()]
+    programVersion = SelectField('Version', validators=[InputRequired()], coerce=int, id='program_version'
         )
-    programReleaseNumber = SelectField('Release Number', validators=[InputRequired()])
+    programReleaseNumber = SelectField('Release Number', validators=[InputRequired()], coerce=int, id='program_release_number')
 
     reportType = SelectField("Report Type", choices=[(1, "Coding Error"), 
         (2, "Suggestion"), (3, "Documentation"), 
         (4, "Hardware"), (5, "Query")
-        ], validators=[InputRequired()]
+        ], validators=[InputRequired()], coerce=int
         )
     severity = SelectField("Severity", choices=[(3, "Minor"), 
         (2, "Serious"), 
-        (1, "Fatal")], validators=[InputRequired()]
+        (1, "Fatal")], validators=[InputRequired()], coerce=int
         )
     summary = StringField("Summary", validators=[DataRequired(), Length(min=1, max=400)]
         )
@@ -36,34 +36,35 @@ class BugReportForm(FlaskForm):
         )
     suggestedFix = StringField("Description", validators=[DataRequired(), Length(min=1, max=400)]
         )
-    reportedBy = SelectField('Reported By', validators=[InputRequired()]
+    reportedBy = SelectField('Reported By', validators=[InputRequired()], coerce=int
         )
     discoveredDate = DateField('Discovered Date', default=date.today
         )
-    assignedTo = SelectField('Assigned To', validators=[InputRequired()]
+    assignedTo = SelectField('Assigned To', validators=[InputRequired()], coerce=int
         )
-    comments = StringField("comments", validators=[DataRequired(), Length(min=1, max=400)])
-    status = SelectField("Status", choices=[("Open", "Open"), ("Closed", "Closed")]
+    comments = StringField("comments", validators=[DataRequired(), Length(min=1, max=400)]
+        )
+    status = SelectField("Status", choices=[(1, "Open"), (2, "Closed")], validators=[InputRequired()], coerce=int
         )
     priority = SelectField("Priority", choices=[(1, "Fix immediately"), 
         (2, "Fix as soon as possible"), (3, "Fix before next milestone"),
         (4, "Fix before release"), (5, "Fix if possible"), 
-        (6, "Optional")], validators=[InputRequired()]
+        (6, "Optional")], validators=[InputRequired()], coerce=int
         )
     resolution = SelectField("Resolution", choices=[(1, "Pending"), (2, "Fixed"),
         (3, "Irreproducible"), (4, "Deferred"), (5, "As designed"),
         (6, "Withdrawn by reporter"), (7, "Need more info"),
         (8, "Disagree with suggestion"), (9, "Duplicate")],
-        validators=[InputRequired()]
+        validators=[InputRequired()], coerce=int
         )
     resolutionVersion = IntegerField("Resolution Version",
-        validators=[NumberRange(1, 4, "Resolution Version must be between 1 and 100")]
+        validators=[NumberRange(1, 4, "Resolution Version must be between 1 and 4")]
         )
-    resolvedBy = SelectField("Resolved By", validators=[InputRequired()]
+    resolvedBy = SelectField("Resolved By", validators=[InputRequired()], coerce=int
         )
     resolvedDate = DateField("Resolved Date", default=date.today
         )
-    testedBy = SelectField("Tested By", validators=[InputRequired()]
+    testedBy = SelectField("Tested By", validators=[InputRequired()], coerce=int
         )
     testedDate = DateField("Tested Date", default=date.today
         )
