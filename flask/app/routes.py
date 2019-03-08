@@ -152,10 +152,6 @@ def upload():
     if request.method == 'POST':
       f = request.files['inputFile']
       f.save(f.filename)
-#      flash(f.filename)
-      print(f.filename)
-      
-      ###################
       con = mysql.connect()
       cursor = con.cursor()
       
@@ -171,16 +167,8 @@ def upload():
       flash('New employee added.')
       return redirect(url_for('index'))          
     else: flash('nothing')
-  
-
-#
     return render_template('upload.html')
-#
 
-1
-2
-3
-4
 def read_file(filename):
     print(filename)
     with open(filename, 'rb') as f:
