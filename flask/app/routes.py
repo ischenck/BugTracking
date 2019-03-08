@@ -140,11 +140,52 @@ def hello_guest(guest):
    return 'Hello %s as Guest' % guest
 
 
+@app.route('/upload')
+def upload_file():
+   return render_template('upload.html')
 
 
+@app.route('/uploader', methods=['GET', 'POST'])
+def upload():
+    error = None
+    #form = RegisterForm(request.form)
+    if request.method == 'POST':
+      f = request.files['inputFile']
+      f.save(f.filename)
+#      flash(f.filename)
+      print(f.filename)
+      
+      ###################
+      con = mysql.connect()
+      cursor = con.cursor()
+      
+      newUpload = (
+                str('1'),
+                str(f.filename), 
+                read_file(f.filename)
+                )
+                
+      sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
+      cursor.execute(sql, newUpload)
+      con.commit()
+      flash('New employee added.')
+      return redirect(url_for('index'))          
+    else: flash('nothing')
+  
 
+#
+    return render_template('upload.html')
+#
 
-
+1
+2
+3
+4
+def read_file(filename):
+    print(filename)
+    with open(filename, 'rb') as f:
+        dat = f.read()
+    return dat
 
 
 
