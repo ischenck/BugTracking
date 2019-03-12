@@ -10,7 +10,7 @@
  <form method="POST" action="/bug_report/" role="form">
   {{ form.csrf_token }}
 
-  <label for="programName">Program:</label>
+  <label for="program">Program:</label>
   <div class="input-group">
     {{ form.program(placeholder="program") }}
     {% if form.program.errors %}
