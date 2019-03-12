@@ -1,52 +1,6 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% block content %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script charset="utf-8", type="text/javascript">
-  $(function(){
-
-     var dropdown = {
-       programName: $('program_name'),
-       programVersion: $('program_version'),
-       programReleaseNumber: $('program_release_number')
-     };
-
-     updateProgram();
-
-     function updateProgram() {
-       var send = {
-         programName: dropdown.programName.val()
-       };
-       dropdown.programVersion.attr('disabled', 'disabled');
-       dropdown.programVersion.empty();
-       dropdown.programReleaseNumber.attr('disabled', 'disabled');
-       dropdown.programReleaseNumber.empty();
-       $.getJSON("{{ url_for('_get_program_info') }}", send, function(data) {
-         data.forEach(function(item) {
-           dropdown.programVersion.append(
-             $('<option>', {
-               value: item[0],
-               text: item[0]
-             })
-           );
-           dropdown.programReleaseNumber.append(
-             $('<option>', {
-               value: item[1],
-               text: item[1]
-             })
-           );            
-         });
-         dropdown.programVersion.removeAttr('disabled');
-         dropdown.programReleaseNumber.removeAttr('disabled');
-       });    
-     }
-
-     dropdown.programName.on('change', function() {
-       updateProgram();
-     });
-   });
-
-  </script>
 
 <div class="container">
 <div class="row align-items center justify-content-center">
@@ -56,38 +10,12 @@
  <form method="POST" action="/bug_report/" role="form">
   {{ form.csrf_token }}
 
-  <label for="programName">Program Name:</label>
+  <label for="programName">Program:</label>
   <div class="input-group">
-    {{ form.programName(placeholder="programName") }}
-    {% if form.programName.errors %}
+    {{ form.program(placeholder="program") }}
+    {% if form.program.errors %}
       <span class="error">
-        {% for error in form.programName.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-    <label for"programVersion">Program Version:</label>
-  <div class="input-group">
-    {{ form.programVersion(placeholder="programVersion") }}
-    {% if form.programVersion.errors %}
-      <span class="error">
-        {% for error in form.programVersion.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-    <label for="programReleaseNumber">Program Release Number:</label>
-  <div class="input-group">
-    {{ form.programReleaseNumber(placeholder="programReleaseNumber") }}
-    {% if form.programReleaseNumber.errors %}
-      <span class="error">
-        {% for error in form.programReleaseNumber.errors %}
+        {% for error in form.program.errors %}
           {{ error }}
         {% endfor %}
       </span>
@@ -350,6 +278,5 @@
 </div>
 </div>
 </div>
-
-
+  
 {% endblock %}

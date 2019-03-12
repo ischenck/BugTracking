@@ -13,11 +13,8 @@ from datetime import date
 
 
 class BugReportForm(FlaskForm):
-    programName = SelectField('Program', validators=[InputRequired()], id='program_name'
+    program = SelectField('Program', validators=[InputRequired()]
         )
-    programVersion = SelectField('Version', validators=[InputRequired()], coerce=int, id='program_version'
-        )
-    programReleaseNumber = SelectField('Release Number', validators=[InputRequired()], coerce=int, id='program_release_number')
 
     reportType = SelectField("Report Type", choices=[(1, "Coding Error"), 
         (2, "Suggestion"), (3, "Documentation"), 
