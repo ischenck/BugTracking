@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm
+from app.forms import EditForm, RegisterForm, BugReportForm, addFuncAreaForm
 from flaskext.mysql import MySQL
 from functools import wraps
 import os
@@ -11,7 +11,7 @@ mysql = MySQL()
  
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -46,11 +46,18 @@ def index():
 def select():
 #    conn = mysql.connect()
     cursor = mysql.connect().cursor()
-    sql = "select * from Employee"
+    sql = "select * from employee"
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('db.html', results=results)
 
+@app.route('/selectFunctionalArea')
+def selectFunctionalArea():
+    cursor = mysql.connect().cursor()
+    sql = "select * from functionalarea"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return render_template('dbFunctionalArea.html', results=results)
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
@@ -102,6 +109,34 @@ def edit(id):
     
     return render_template('edit.html', results=employeeString, form=form)
 
+@app.route('/editFunctionalArea/<id>', methods =['GET' , 'POST'])
+def editFunctionalArea(id):
+    form = addFuncAreaForm()
+    con = mysql.connect()
+    cursor = con.cursor()
+    
+    sql = "select * from functionalArea where areaName="+str(id)
+    cursor.execute(sql)
+    results = cursor.fetchone()
+    areaString = results
+    
+    if request.method == 'GET':
+        form.area.data = results[1]
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            editedArea = (str(form.area.data))
+            try:
+                sql = "UPDATE functionalArea SET areaname=%s WHERE areaName="+str(id)
+                cursor.execute(sql,editedArea)
+                con.commit()
+                return redirect(url_for('selectFunctionalArea'))
+            except Exception as e:
+                print("problem" + str(e))
+                return redirect(url_for('selectFunctionalArea'))
+            
+    return render_template('editFunctionalArea.html', results=areaString, form=form)
+    
+
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     error = None
@@ -135,6 +170,21 @@ def register():
                 return redirect(url_for('register'))
 
     return render_template('register.html', form=form, error=error)
+
+@app.route('/addFunctionalArea', methods=['GET','POST'])
+def addFunctionalArea():
+    error = None
+    form = addFuncAreaForm(request.form)
+    newArea = (str(form.area.data))
+    con = mysql.connect()
+    cursor = con.cursor()
+    if request.method == 'POST':
+        sql = 'INSERT INTO functionalarea(areaName) VALUES (%s)'
+        cursor.execute(sql, newArea)
+        con.commit()
+        return redirect(url_for('addFunctionalArea'))
+    
+    return render_template('addFunctionalArea.html', form=form, error=error)
 
 
 
