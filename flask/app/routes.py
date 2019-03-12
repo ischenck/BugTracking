@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm
+from app.forms import EditForm, RegisterForm, BugReportForm, SearchForm
 from flaskext.mysql import MySQL
 from functools import wraps
 import os
@@ -142,6 +142,64 @@ def register():
 def hello_guest(guest):
    return 'Hello %s as Guest' % guest
 
+
+
+@app.route('/search/', methods=['GET', 'POST'])
+def search():
+    error = None
+    form = SearchForm(request.form)
+    con = mysql.connect()
+    cursor = con.cursor()
+    sql = "SELECT * FROM Program"
+    cursor.execute(sql)
+    programs = cursor.fetchall()
+    programStr = "%s, version: %s, release: %s"
+
+    programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
+    form.program.choices = programList
+    
+    sql = "SELECT employeeId, name FROM Employee"
+    cursor.execute(sql)
+
+    employees = ((0,''),) + cursor.fetchall()
+
+    form.reportedBy.choices = employees
+    form.assignedTo.choices = employees
+    form.resolvedBy.choices = employees
+
+    sql = "SELECT * FROM FunctionalArea"
+    cursor.execute(sql)
+    areas = cursor.fetchall()
+    areas_list= [('',''),] + [(str(i[0]), str(i[0])) for i in areas]
+    form.functionalArea.choices = areas_list
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            allData = {
+                "programId" : str(form.program.data),
+                "reportType" : str(form.reportType.data),
+                "severity" : str(form.severity.data),
+                "areaName" : str(form.functionalArea.data),
+                "assignedTo" : str(form.assignedTo.data),
+                "status" : str(form.status.data),
+                "priority" : str(form.priority.data),
+                "resolution" : str(form.resolution.data),
+                "reportedBy" : str(form.reportedBy.data),
+                "discoveredDate" : str(form.discoveredDate.data),
+                "resolvedBy" : str(form.resolvedBy.data)
+            }
+            print(allData)
+            invalid = ('', '0', 'None')
+            searchData = { key:val for key, val in allData.items() if val not in invalid}
+
+            
+
+            print(searchData)
+            return redirect(url_for('search'))
+
+
+ 
+    return render_template('search.html', form=form, error=error)
 
 
 @app.route('/bug_report/', methods=['GET', 'POST'])
