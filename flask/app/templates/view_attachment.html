@@ -1,0 +1,40 @@
+
+
+{% extends "base.html" %}
+
+{% block content %} 
+ 
+
+
+
+<div class="container">
+<table class="table table-bordered">
+    <thead>
+        <tr>
+        <td>File Name</td>
+        <td>File Contents</td>
+        </tr>
+    </thead>
+    <tbody>
+    
+    <tr>
+        <td>{{ res[0] }}</td>
+        {% if res[0].lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+        <td><img src="{{url_for('static', filename =res[1])}}"></td>
+        
+        {% else %}
+        <td><pre> {{res[1]}} </pre></td>
+        {% endif %}        
+    </tr>
+    
+  
+
+    </tbody>
+</table>
+</div>
+
+
+{% endblock %}
+
+
+    

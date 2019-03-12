@@ -1,4 +1,4 @@
-drop  database bughound;
+#drop  database bughound;
 #drop table Attachment;
 #drop table BugReport;
 #drop table Program;
@@ -65,7 +65,7 @@ create table BugReport(
 create table Attachment(
     reportId int(10) not null,
     fileName varchar(40) not null,
-    file blob,
+    file longblob,
     primary key (reportId, fileName),
     foreign key (reportId) references BugReport(reportId)
 );
@@ -83,10 +83,6 @@ insert into Employee values(null, 'John House','john','password', 2,  'Software'
 insert into Program values(null,'Space Fighter', '1','1','Galactic Fighter');
 insert into Program values(null,'Street Fighter', '1','1','2d console fighter');
 
-
-
-
-
-
-
+insert into BugReport values(null,1,1,1,"summary",true,"test dat","fix nothing",1,'1990-1-1',2,"no comments",1,1,1,111,2,'1990-1-1',1,'1990-1-1',false);
+    
 

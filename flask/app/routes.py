@@ -3,7 +3,9 @@ from app import app
 from app.forms import EditForm, RegisterForm, BugReportForm
 from flaskext.mysql import MySQL
 from functools import wraps
-
+import os
+import base64
+#from utils import *
 mysql = MySQL()
  
 # MySQL configurations
@@ -139,6 +141,7 @@ def hello_guest(guest):
    return 'Hello %s as Guest' % guest
 
 
+
 @app.route('/bug_report/', methods=['GET', 'POST'])
 def bug_report():
     error = None
@@ -224,8 +227,120 @@ def _get_program_info():
 
 
 
+@app.route('/upload')
+def upload_file():
+   return render_template('upload.html')
 
 
+@app.route('/uploader', methods=['GET', 'POST'])
+def upload():
+    error = None
+    #form = RegisterForm(request.form)
+    if request.method == 'POST':
+      f = request.files['inputFile']
+      f.save(os.path.join('temp_file/',f.filename))
+      
+      con = mysql.connect()
+      cursor = con.cursor()      
+      newUpload = (
+                str('1'),
+                str(f.filename), 
+                read_file(os.path.join('temp_file/',f.filename))
+                )
+                
+      sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
+      
+      try:
+          cursor.execute(sql, newUpload)
+          con.commit()
+          flash('New employee added.')
+      except Exception as e:
+          flash("Problem inserting into db: " + str(e))
+          os.remove(os.path.join('temp_file/',f.filename))
+          con.close()
+          return redirect(url_for('upload'))
+
+      #clean file
+      os.remove(os.path.join('temp_file/',f.filename))
+      con.close()  
+      return redirect(url_for('index'))          
+  
+    else: flash('nothing')
+    return render_template('upload.html')
+
+'''
+Select all from the attachment table and place
+results in a table in attachments.html.
+'''
+@app.route('/attachments')
+def attachments():
+    cursor = mysql.connect().cursor()
+    sql = "select * from Attachment"
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+    except Exception as e:
+        flash("Problem getting files: " + str(e))
+    return render_template('attachments.html', results=results)
+
+'''
+When a file gets selected in attachments.html
+the <report> number and the <file> name are passed here.
+Then, this function selects that specific file and
+renders it in view_attachment.html.
+'''
+@app.route('/showFile/<report>/<file>')
+def showFile(report,file):
+    cursor = mysql.connect().cursor()
+     
+    sql = "select * from Attachment where reportId=%s and fileName=%s"
+    selectAttachment = (
+                str(report), 
+                str(file)) 
+    res = list()        
+    try:
+        cursor.execute(sql,selectAttachment)
+        results = cursor.fetchall()    
+    except Exception as e:
+        flash("Problem getting files: " + str(e))
+    
+    #results should only return 1 item in [0]
+    #where [0][1] is the file name and [0][2] is the binary file
+    write_file(results[0][2],results[0][1])
+    res.append(results[0][1])
+    file_ = results[0][1]
+    
+    if results[0][1].lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+#        res.append(base64.decodestring(results[0][2]))
+        res.append(results[0][1])
+    else:
+        path = 'app/static/'+file_
+        text = open(path, 'r+')
+        res.append(text.read())
+        text.close()
+    
+#    res.append(os.path.join('temp_file/',results[0][1]))
+    
+    return render_template('view_attachment.html', res=res, results=results)
+
+
+
+'''
+helper functions to read and write files
+'''
+def write_file(data, filename):
+    # Convert binary data to proper format and write it on Hard Disk
+    flname = 'app/static/'+filename
+    with open(flname, 'wb') as f:
+        f.write(data)
+    
+        
+#read the file to input to db
+def read_file(filename):
+    print(filename)
+    with open(filename, 'rb') as f:
+        dat = f.read()
+    return dat
 
 
 

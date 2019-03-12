@@ -1,0 +1,36 @@
+
+
+{% extends "base.html" %}
+
+{% block content %} 
+ 
+
+
+
+<div class="container">
+<table class="table table-bordered">
+    <thead>
+        <tr>
+        <td>Report Number</td>
+        <td>File Name</td>
+        </tr>
+    </thead>
+    <tbody>
+{% for row in results %}
+      
+    <tr>
+        <td>{{ row[0] }}</td>
+        <td><a href="{{ url_for('showFile', report=row[0],file=row[1]) }}">{{row[1]}}</a></td>
+   
+    </tr>
+      
+{% endfor %}
+    </tbody>
+</table>
+</div>
+
+
+{% endblock %}
+
+
+    
