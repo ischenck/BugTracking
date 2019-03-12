@@ -5,6 +5,7 @@ from flaskext.mysql import MySQL
 from functools import wraps
 import os
 import base64
+
 #from utils import *
 mysql = MySQL()
  
@@ -32,14 +33,14 @@ def index():
     return render_template('index.html', title='Home', user=user, posts=posts)
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
-        return redirect(url_for('index'))
-    return render_template('login.html',  title='Sign In', form=form)
+#@app.route('/login', methods=['GET', 'POST'])
+#def login():
+#    form = LoginForm()
+#    if form.validate_on_submit():
+#        flash('Login requested for user {}, remember_me={}'.format(
+#            form.username.data, form.remember_me.data))
+#        return redirect(url_for('index'))
+#    return render_template('login.html',  title='Sign In', form=form)
 
 @app.route('/select')
 def select():
@@ -125,6 +126,7 @@ def register():
             try:
                 sql = "INSERT INTO Employee (name, username, password, level, area) VALUES (%s, %s, %s, %s, %s)"
                 cursor.execute(sql, newEmployee)
+                
                 con.commit()
                 flash('New employee added.')
                 return redirect(url_for('select'))
@@ -166,48 +168,74 @@ def bug_report():
     form.assignedTo.choices = employees
     form.resolvedBy.choices = employees
     form.testedBy.choices = employees
-    if  request.method == 'GET':
-        return render_template('bug_report.html', form=form, error=error)
-    if form.validate_on_submit():
-        reproducable = int(str(form.reproducable.data) == 'True')
-        deferred = int(str(form.deferred.data) == 'True')
-        bugReportData = (
-            str(form.program.data),
-            str(form.reportType.data),
-            str(form.severity.data),
-            str(form.summary.data),
-            str(reproducable),
-            str(form.description.data),
-            str(form.suggestedFix.data),
-            str(form.reportedBy.data),
-            str(form.discoveredDate.data),
-            str(form.assignedTo.data),
-            str(form.comments.data),
-            str(form.status.data),
-            str(form.priority.data),
-            str(form.resolution.data),
-            str(form.resolutionVersion.data),
-            str(form.resolvedBy.data),
-            str(form.resolvedDate.data),
-            str(form.testedBy.data),
-            str(form.testedDate.data),
-            str(deferred)
-            )
-        try:
-            sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
-                reproducable, description, suggestedFix, reportedBy, discoveredDate, \
-                assignedTo, comments, status, priority, resolution, \
-                resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, deferred) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-            cursor.execute(sql, bugReportData)
-            con.commit()
-            print('New Bug Report added')
-            return redirect(url_for('bug_report'))
-        except Exception as e:
-            print("Problem inserting into db: " + str(e))
-            return redirect(url_for('bug_report'))
-            
+    #sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
+    #cursor.execute(sql)
+    #id = cursor.fetchone()[0]
+
+    #if  request.method == 'GET':
+    #   return render_template('bug_report.html', form=form, error=error)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print("good!")
+            #f = form.attachment.data
+            #f.save(os.path.join(app.instance_path, 'temp_file/', f.filename))
+
+            #attachment = (
+            #        str(id),
+            #        str(f.filename), 
+            #        read_file(os.path.join('temp_file/',f.filename))
+            #        )
+
+            reproducable = int(str(form.reproducable.data) == 'True')
+            deferred = int(str(form.deferred.data) == 'True')
+            bugReportData = (
+                str(form.program.data),
+                str(form.reportType.data),
+                str(form.severity.data),
+                str(form.summary.data),
+                str(reproducable),
+                str(form.description.data),
+                str(form.suggestedFix.data),
+                str(form.reportedBy.data),
+                str(form.discoveredDate.data),
+                str(form.assignedTo.data),
+                str(form.comments.data),
+                str(form.status.data),
+                str(form.priority.data),
+                str(form.resolution.data),
+                str(form.resolutionVersion.data),
+                str(form.resolvedBy.data),
+                str(form.resolvedDate.data),
+                str(form.testedBy.data),
+                str(form.testedDate.data),
+                str(deferred)
+                )
+            try:
+                sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
+                    reproducable, description, suggestedFix, reportedBy, discoveredDate, \
+                    assignedTo, comments, status, priority, resolution, \
+                    resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, deferred) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+                cursor.execute(sql, bugReportData)
+                con.commit()
+                #sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
+                #cursor.execute(sql, attachment)
+                #con.commit()
+                print('New Bug Report added')
+
+                return redirect(url_for('bug_report'))
+            except Exception as e:
+                print("Problem inserting into db: " + str(e))
+                #os.remove(os.path.join('temp_file/',f.filename))
+                return redirect(url_for('bug_report'))
+                
+                #clean file
+            #os.remove(os.path.join('temp_file/',f.filename))
+            #con.close()  
+        else:
+            print("bad!")
     return render_template('bug_report.html', form=form, error=error)
 
 '''
@@ -232,7 +260,7 @@ def upload_file():
    return render_template('upload.html')
 
 
-@app.route('/uploader', methods=['GET', 'POST'])
+@app.route('/uploader/', methods=['GET', 'POST'])
 def upload():
     error = None
     #form = RegisterForm(request.form)

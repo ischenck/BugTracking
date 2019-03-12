@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, PasswordField, BooleanField, SubmitField, IntegerField, SelectField
 from wtforms.validators import DataRequired, EqualTo, NumberRange, Length, InputRequired
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from datetime import date
 #we are going to need some login form for another page so keep for now
 #class LoginForm(FlaskForm):
@@ -13,7 +14,7 @@ from datetime import date
 
 
 class BugReportForm(FlaskForm):
-    program = SelectField('Program', validators=[InputRequired()]
+    program = SelectField('Program', validators=[InputRequired()], coerce=int
         )
 
     reportType = SelectField("Report Type", choices=[(1, "Coding Error"), 
@@ -67,6 +68,8 @@ class BugReportForm(FlaskForm):
         )
     deferred = BooleanField("Deferred"
         )
+
+    # attachment = FileField("Attachment", validators=[FileRequired()])
 
 class EditForm(FlaskForm):
     name = StringField(
