@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from app import app
-from app.forms import EditForm, RegisterForm
+from app.forms import EditForm, RegisterForm, BugReportForm
 from flaskext.mysql import MySQL
 from functools import wraps
 
@@ -113,7 +113,6 @@ def register():
     if request.method == 'POST':
         form.functionalArea.choices = areas_list
         if form.validate_on_submit():
-            area = "Software"
             newEmployee = (
                 str(form.name.data), 
                 str(form.username.data), 
@@ -138,6 +137,90 @@ def register():
 @app.route('/editEmployee/<guest>')
 def hello_guest(guest):
    return 'Hello %s as Guest' % guest
+
+
+@app.route('/bug_report/', methods=['GET', 'POST'])
+def bug_report():
+    error = None
+    form = BugReportForm(request.form)
+    con = mysql.connect()
+    cursor = con.cursor()
+    sql = "SELECT * FROM Program"
+    cursor.execute(sql)
+
+    programs = cursor.fetchall()
+    programStr = "%s, version: %s, release: %s"
+    programList = [(i[0], (programStr % i[1:4])) for i in programs]
+
+    form.program.choices = programList
+
+    sql = "SELECT employeeId, name FROM Employee"
+    cursor.execute(sql)
+
+    employees = cursor.fetchall()
+
+    form.reportedBy.choices = employees
+    form.assignedTo.choices = employees
+    form.resolvedBy.choices = employees
+    form.testedBy.choices = employees
+    if  request.method == 'GET':
+        return render_template('bug_report.html', form=form, error=error)
+    if form.validate_on_submit():
+        reproducable = int(str(form.reproducable.data) == 'True')
+        deferred = int(str(form.deferred.data) == 'True')
+        bugReportData = (
+            str(form.program.data),
+            str(form.reportType.data),
+            str(form.severity.data),
+            str(form.summary.data),
+            str(reproducable),
+            str(form.description.data),
+            str(form.suggestedFix.data),
+            str(form.reportedBy.data),
+            str(form.discoveredDate.data),
+            str(form.assignedTo.data),
+            str(form.comments.data),
+            str(form.status.data),
+            str(form.priority.data),
+            str(form.resolution.data),
+            str(form.resolutionVersion.data),
+            str(form.resolvedBy.data),
+            str(form.resolvedDate.data),
+            str(form.testedBy.data),
+            str(form.testedDate.data),
+            str(deferred)
+            )
+        try:
+            sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
+                reproducable, description, suggestedFix, reportedBy, discoveredDate, \
+                assignedTo, comments, status, priority, resolution, \
+                resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, deferred) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+            cursor.execute(sql, bugReportData)
+            con.commit()
+            print('New Bug Report added')
+            return redirect(url_for('bug_report'))
+        except Exception as e:
+            print("Problem inserting into db: " + str(e))
+            return redirect(url_for('bug_report'))
+            
+    return render_template('bug_report.html', form=form, error=error)
+
+'''
+@app.route('/_get_program_info/')
+def _get_program_info():
+    programName = request.args.get('programName', '01', type=str)
+    print(programName)
+    con = mysql.connect()
+    cursor = con.cursor()
+    sql = "SELECT version, releaseNumber FROM Program WHERE name = %s"
+    cursor.execute(sql, str(programName))
+    info = cursor.fetchall()
+    print(info)
+    return jsonify(info)
+'''
+
 
 
 
