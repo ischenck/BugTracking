@@ -69,7 +69,7 @@ class BugReportForm(FlaskForm):
     deferred = BooleanField("Deferred"
         )
 
-    # attachment = FileField("Attachment", validators=[FileRequired()])
+    #attachment = FileField("Attachment", validators=[FileRequired()])
 
 class EditForm(FlaskForm):
     name = StringField(

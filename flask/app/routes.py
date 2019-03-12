@@ -172,6 +172,7 @@ def bug_report():
     #sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
     #cursor.execute(sql)
     #id = cursor.fetchone()[0]
+    #print(id)
 
     #if  request.method == 'GET':
     #   return render_template('bug_report.html', form=form, error=error)
@@ -225,7 +226,7 @@ def bug_report():
                 #con.commit()
                 print('New Bug Report added')
 
-                return redirect(url_for('bug_report'))
+                return redirect(url_for('upload'))
             except Exception as e:
                 print("Problem inserting into db: " + str(e))
                 #os.remove(os.path.join('temp_file/',f.filename))
@@ -262,36 +263,42 @@ def upload_file():
 
 @app.route('/uploader/', methods=['GET', 'POST'])
 def upload():
-    error = None
-    #form = RegisterForm(request.form)
+    #error = None
     if request.method == 'POST':
-      f = request.files['inputFile']
-      f.save(os.path.join('temp_file/',f.filename))
-      
-      con = mysql.connect()
-      cursor = con.cursor()      
-      newUpload = (
-                str('1'),
-                str(f.filename), 
-                read_file(os.path.join('temp_file/',f.filename))
-                )
-                
-      sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
-      
-      try:
-          cursor.execute(sql, newUpload)
-          con.commit()
-          flash('New employee added.')
-      except Exception as e:
-          flash("Problem inserting into db: " + str(e))
-          os.remove(os.path.join('temp_file/',f.filename))
-          con.close()
-          return redirect(url_for('upload'))
+        f = request.files['inputFile']
+        f.save(os.path.join('temp_file/',f.filename))
+        
+        con = mysql.connect()
+        cursor = con.cursor() 
+        sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
+        cursor.execute(sql)
+        id = cursor.fetchone()[0] - 1
+        print(id)    
+        newUpload = (
+                    str(id),
+                    str(f.filename), 
+                    read_file(os.path.join('temp_file/',f.filename))
+                    )
+                    
+        sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
+        
+        try:
+            cursor.execute(sql, newUpload)
+            con.commit()
+            
+            print('New attachment added.')
+            return redirect(url_for('bug_report'))
 
-      #clean file
-      os.remove(os.path.join('temp_file/',f.filename))
-      con.close()  
-      return redirect(url_for('index'))          
+        except Exception as e:
+            print("Problem inserting into db: " + str(e))
+            os.remove(os.path.join('temp_file/',f.filename))
+            con.close()
+            return redirect(url_for('upload'))
+
+        #clean file
+        os.remove(os.path.join('temp_file/',f.filename))
+        con.close()  
+        return redirect(url_for('index'))          
   
     else: flash('nothing')
     return render_template('upload.html')
