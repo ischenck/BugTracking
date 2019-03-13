@@ -106,7 +106,20 @@ class RegisterForm(FlaskForm):
         validators=[NumberRange(1, 4, "User Level must be between 1 and 4")]
     )
     functionalArea = SelectField('Functional Area', validators=[InputRequired()])
+    
 
 class addFuncAreaForm(FlaskForm):
     area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
+
+class addProgramForm(FlaskForm):
+    programID = IntegerField(
+            'programId', validators = [DataRequired(), Length(min=1, max=40)])
+    name = StringField(
+            'name', validators = [DataRequired(), Length(min=1, max=40)])
+    version = IntegerField(
+            'version', validators = [DataRequired(), Length(min=1, max=40)])
+    releaseNumber = IntegerField(
+            'releaseNumber', validators = [DataRequired(), Length(min=1, max=40)])
+    description = StringField(
+            'description', validators = [DataRequired(), Length(min=1, max=40)])
     

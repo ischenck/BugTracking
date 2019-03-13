@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm, addFuncAreaForm
+from app.forms import EditForm, RegisterForm, BugReportForm, addFuncAreaForm, addProgramForm
 from flaskext.mysql import MySQL
 from functools import wraps
 import os
@@ -186,6 +186,23 @@ def addFunctionalArea():
     
     return render_template('addFunctionalArea.html', form=form, error=error)
 
+@app.route('/addProgram', methods=['GET', 'POST'])
+def addProgram():
+    error = None
+    form = addProgramForm(request.form)
+    newProgram= (str(form.programID.data),
+                 str(form.name.data),
+                 str(form.version.data),
+                 str(form.releaseNumber.data),
+                 str(form.description.data))
+    con = mysql.connect()
+    cursor = con.cursor()
+    if request.method == 'POST':
+        sql = 'INSERT INTO program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
+        cursor.execute(sql,newProgram)
+        con.commit()
+        return redirect(url_for('addProgram'))
+    return render_template('addProgram.html', form=form, error=error)
 
 
 @app.route('/editEmployee/<guest>')
