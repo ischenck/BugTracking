@@ -160,13 +160,19 @@ def bug_report():
     form.program.choices = programList
 
     #get funtional area and pass to select list
-    sql = "SELECT areaName FROM FunctionalArea"
-    cursor.execute(sql)
-    funcAreaList=[]
-    for i,j in enumerate(cursor.fetchall()):
-        funcAreaList.append((i,j[0]))
-    form.functionalArea.choices = funcAreaList
+#    sql = "SELECT areaName FROM FunctionalArea"
+#    cursor.execute(sql)
+#    funcAreaList=[]
+#    for i,j in enumerate(cursor.fetchall()):
+#        funcAreaList.append((i,str(j[0])))
+#    form.areaName.choices = funcAreaList
     #end functionalArea
+   
+    sql = "SELECT * FROM FunctionalArea"
+    cursor.execute(sql)
+    areas = cursor.fetchall()
+    areas_list=[(str(i[0]), str(i[0])) for i in areas]
+    form.areaName.choices = areas_list
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
@@ -220,14 +226,14 @@ def bug_report():
                 str(form.testedBy.data),
                 str(form.testedDate.data),
                 str(deferred),
-                str(form.functionalArea.data)
+                str(form.areaName.data)
                 )
             try:
                 sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
                     reproducable, description, suggestedFix, reportedBy, discoveredDate, \
                     assignedTo, comments, status, priority, resolution, \
                     resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, \
-                    deferred,functionalArea) \
+                    deferred,areaName) \
                     VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                 cursor.execute(sql, bugReportData)

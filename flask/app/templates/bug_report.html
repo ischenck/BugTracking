@@ -173,10 +173,10 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Functional Area</span>
                   </div>
-                {{ form.functionalArea(placeholder="Functional Area") }}
-                {% if form.functionalArea.errors %}
+                {{ form.areaName(placeholder="Functional Area") }}
+                {% if form.areaName.errors %}
                   <span class="error">
-                    {% for error in form.functionalArea.errors %}
+                    {% for error in form.areaName.errors %}
                       {{ error }}
                     {% endfor %}
                   </span>
