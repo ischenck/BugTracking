@@ -126,7 +126,7 @@ def editFunctionalArea(id):
         if form.validate_on_submit():
             editedArea = (str(form.area.data))
             try:
-                sql = "UPDATE functionalArea SET areaname=%s WHERE areaName="+str(id)
+                sql = "UPDATE functionalArea SET areaName=%s WHERE areaName=" + str(id)
                 cursor.execute(sql,editedArea)
                 con.commit()
                 return redirect(url_for('selectFunctionalArea'))
