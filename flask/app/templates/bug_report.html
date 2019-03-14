@@ -5,271 +5,366 @@
 <div class="container">
 <div class="row align-items center justify-content-center">
 <div class="col-md-4">
-<h3>Add New Bug Report</h3>
+<h3>New Bug Report Entry Page</h3>
+
 <div class="form-group">
  <form method="POST" action="/bug_report/" role="form">
   {{ form.csrf_token }}
-
-  <label for="program">Program:</label>
-  <div class="input-group">
-    {{ form.program(placeholder="program") }}
-    {% if form.program.errors %}
-      <span class="error">
-        {% for error in form.program.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-    <label for="reportType">Report Type: </label>
-  <div class="input-group">
-    {{ form.reportType(placeholder="reportType") }}
-    {% if form.reportType.errors %}
-      <span class="error">
-        {% for error in form.reportType.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  	<label for="severity">Severity: </label>
-  <div class="input-group">
-    {{ form.severity(placeholder="severity") }}
-    {% if form.severity.errors %}
-      <span class="error">
-        {% for error in form.severity.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-    <label for="summary">Summary: </label>
-  <div class="input-group">
-    {{ form.summary(placeholder="summary") }}
-    {% if form.summary.errors %}
-      <span class="error">
-        {% for error in form.summary.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-     <label for="reproducable">Reproducable: </label>
-  <div class="input-group">
-    {{ form.reproducable(placeholder="reproducable") }}
-    {% if form.reproducable.errors %}
-      <span class="error">
-        {% for error in form.reproducable.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="description">Description: </label>
-  <div class="input-group">
-    {{ form.description(placeholder="description") }}
-    {% if form.description.errors %}
-      <span class="error">
-        {% for error in form.description.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="suggestedFix">Suggested Fix: </label>
-  <div class="input-group">
-    {{ form.suggestedFix(placeholder="suggestedFix") }}
-    {% if form.suggestedFix.errors %}
-      <span class="error">
-        {% for error in form.suggestedFix.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="reportedBy">Reported By: </label>
-  <div class="input-group">
-    {{ form.reportedBy(placeholder="reportedBy") }}
-    {% if form.reportedBy.errors %}
-      <span class="error">
-        {% for error in form.reportedBy.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="discoveredDate">Discovered Date: </label>
-  <div class="input-group">
-    {{ form.discoveredDate(placeholder="discoveredDate") }}
-    {% if form.discoveredDate.errors %}
-      <span class="error">
-        {% for error in form.discoveredDate.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="assignedTo">Assigned To: </label>
-  <div class="input-group">
-    {{ form.assignedTo(placeholder="assignedTo") }}
-    {% if form.assignedTo.errors %}
-      <span class="error">
-        {% for error in form.assignedTo.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="comments">Comments: </label>
-  <div class="input-group">
-    {{ form.comments(placeholder="comments") }}
-    {% if form.comments.errors %}
-      <span class="error">
-        {% for error in form.comments.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="status">Status: </label>
-  <div class="input-group">
-    {{ form.status(placeholder="status") }}
-    {% if form.status.errors %}
-      <span class="error">
-        {% for error in form.status.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="priority">Priority: </label>
-  <div class="input-group">
-    {{ form.priority(placeholder="priority") }}
-    {% if form.priority.errors %}
-      <span class="error">
-        {% for error in form.priority.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="resolution">Resolution: </label>
-  <div class="input-group">
-    {{ form.resolution(placeholder="resolution") }}
-    {% if form.resolution.errors %}
-      <span class="error">
-        {% for error in form.resolution.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
-  <label for="resolutionVersion">Resolution Version: </label>
-  <div class="input-group">
-    {{ form.resolutionVersion(placeholder="resolutionVersion") }}
-    {% if form.resolutionVersion.errors %}
-      <span class="error">
-        {% for error in form.resolutionVersion.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
-  <label for="resolvedBy">Resolved By: </label>
-  <div class="input-group">
-    {{ form.resolvedBy(placeholder="resolvedBy") }}
-    {% if form.resolvedBy.errors %}
-      <span class="error">
-        {% for error in form.resolvedBy.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
-  <label for="resolvedDate">Resolved Date: </label>
-  <div class="input-group">
-    {{ form.resolvedDate(placeholder="resolvedDate") }}
-    {% if form.resolvedDate.errors %}
-      <span class="error">
-        {% for error in form.resolvedDate.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
-  <label for="testedBy">Tested By: </label>
-  <div class="input-group">
-    {{ form.testedBy(placeholder="testedBy") }}
-    {% if form.testedBy.errors %}
-      <span class="error">
-        {% for error in form.testedBy.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
-  <label for="testedDate">Tested Date: </label>
-  <div class="input-group">
-    {{ form.testedDate(placeholder="testedDate") }}
-    {% if form.testedDate.errors %}
-      <span class="error">
-        {% for error in form.testedDate.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
-  <label for="deferred">Deferred: </label>
-  <div class="input-group">
-    {{ form.deferred(placeholder="deferred") }}
-    {% if form.deferred.errors %}
-      <span class="error">
-        {% for error in form.deferred.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
-
+    <table class="table">
+        <tbody>
+        
+        <tr>
+            <td>            
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Program</span>
+                    </div>
+                    {{ form.program(placeholder="program") }}
+                    {% if form.program.errors %}
+                      <span class="error">
+                        {% for error in form.program.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Report Type</span>
+                    </div>
+                    {{ form.reportType(placeholder="reportType") }}
+                    {% if form.reportType.errors %}
+                      <span class="error">
+                        {% for error in form.reportType.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                 </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Severity</span>
+                    </div>
+                    {{ form.severity(placeholder="severity") }}
+                    {% if form.severity.errors %}
+                      <span class="error">
+                        {% for error in form.severity.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>     
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Summary</span>
+                    </div>
+                    <textarea class="form-control" id="summary" name="summary" 
+                        placeholder="Summary" aria-label="With textarea"></textarea>
+                    {% if form.summary.errors %}
+                        <span class="error">
+                        {% for error in form.summary.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        </span>
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Reproducable</span>
+                    </div>
+                   
+                   {{ form.reproducable(placeholder="reproducable") }}
+                   {% if form.reproducable.errors %}
+                      <span class="error">
+                      {% for error in form.reproducable.errors %}
+                          {{ error }}
+                      {% endfor %}
+                      </span>
+                   {% endif %}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Description</span>
+                    </div>
+                    <textarea class="form-control" id="description" name="description" 
+                         placeholder="Description" aria-label="With textarea"></textarea>
+                    
+                        {% if form.description.errors %}
+                        <span class="error">
+                            {% for error in form.description.errors %}
+                              {{ error }}
+                            {% endfor %}
+                        </span>
+                        {% endif %}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                  
+              <div class="input-group">
+                  <div class="input-group-prepend">
+                        <span class="input-group-text">Suggested Fix</span>
+                  </div>
+                  <textarea class="form-control" id="suggestedFix" name="suggestedFix" 
+                         placeholder="Suggested Fix" aria-label="With textarea"></textarea>
+                    
+                  {% if form.suggestedFix.errors %}
+                  <span class="error">
+                    {% for error in form.suggestedFix.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </span>
+                {% endif %}
+              </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <div class="input-group">
+                   <div class="input-group-prepend">
+                        <span class="input-group-text">Reported By</span>
+                  </div>
+                {{ form.reportedBy(placeholder="Reported By") }}
+                {% if form.reportedBy.errors %}
+                <span class="error">
+                    {% for error in form.reportedBy.errors %}
+                      {{ error }}
+                    {% endfor %}
+                </span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                        <span class="input-group-text">Discovered Date:</span>
+                  </div>
+                    {{ form.discoveredDate(placeholder="discoveredDate") }}
+                    {% if form.discoveredDate.errors %}
+                    <span class="error">
+                        {% for error in form.discoveredDate.errors %}
+                          {{ error }}
+                        {% endfor %}
+                    </span>
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+             <td>
+                 <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Functional Area</span>
+                  </div>
+                {{ form.areaName(placeholder="Functional Area") }}
+                {% if form.areaName.errors %}
+                  <span class="error">
+                    {% for error in form.areaName.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </span>
+                {% endif %}
+                </div>
+             </td>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Assigned To</span>
+                  </div>
+                {{ form.assignedTo(placeholder="Assigned To") }}
+                {% if form.assignedTo.errors %}
+                  <span class="error">
+                    {% for error in form.assignedTo.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </span>
+                {% endif %}
+                </div>
+            </td>
+            <td></td>
+       
+        </tr>
+        <tr>
+            <td colspan="3">
+                <div class="input-group">
+                      <div class="input-group-prepend">
+                            <span class="input-group-text">Comments</span>
+                      </div>
+                    <textarea class="form-control" id="comments" name="comments" 
+                         placeholder="Comments" aria-label="With textarea"></textarea>
+                   
+                    {% if form.comments.errors %}
+                    <span class="error">
+                        {% for error in form.comments.errors %}
+                          {{ error }}
+                        {% endfor %}
+                    </span>
+                    {% endif %}
+                  </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Status</span>
+                </div>
+                {{ form.status(placeholder="status") }}
+                {% if form.status.errors %}
+              <span class="error">
+                    {% for error in form.status.errors %}
+                      {{ error }}
+                    {% endfor %}
+              </span>
+                {% endif %}
+              </div>
+            
+            </td>
+            <td>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Priority</span>
+                    </div>
+                    {{ form.priority(placeholder="priority") }}
+                    {% if form.priority.errors %}
+                      <span class="error">
+                        {% for error in form.priority.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+            <td>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Resolution</span>
+                    </div>
+                    {{ form.resolution(placeholder="resolution") }}
+                    {% if form.resolution.errors %}
+                      <span class="error">
+                        {% for error in form.resolution.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                            <span class="input-group-text">Resolution Version</span>
+                        </div>
+                    {{ form.resolutionVersion(placeholder="resolutionVersion") }}
+                    {% if form.resolutionVersion.errors %}
+                      <span class="error">
+                        {% for error in form.resolutionVersion.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+            <td>
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Resolved By</span>
+                    </div>
+                    {{ form.resolvedBy(placeholder="resolvedBy") }}
+                    {% if form.resolvedBy.errors %}
+                      <span class="error">
+                        {% for error in form.resolvedBy.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+            <td>
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Resolved Date</span>
+                    </div>
+                    {{ form.resolvedDate(placeholder="resolvedDate") }}
+                    {% if form.resolvedDate.errors %}
+                      <span class="error">
+                        {% for error in form.resolvedDate.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Tested By</span>
+                    </div>
+                    {{ form.testedBy(placeholder="testedBy") }}
+                    {% if form.testedBy.errors %}
+                      <span class="error">
+                        {% for error in form.testedBy.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+            <td>
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Tested Date</span>
+                    </div>
+                    {{ form.testedDate(placeholder="testedDate") }}
+                    {% if form.testedDate.errors %}
+                      <span class="error">
+                        {% for error in form.testedDate.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+            <td>
+                 
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Defered</span>
+                      </div>
+                    {{ form.deferred(placeholder="deferred") }}
+                    {% if form.deferred.errors %}
+                      <span class="error">
+                        {% for error in form.deferred.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 
    <button class="btn btn-sm btn-success" type="submit">Add New Bug Report</button>
