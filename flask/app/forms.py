@@ -26,7 +26,7 @@ class SearchForm(FlaskForm):
         (1, "Fatal")], default='', validators=[Optional()], coerce=int
         )
     
-    functionalArea = SelectField('Functional Area', validators=[Optional()]
+    areaName = SelectField('Functional Area', validators=[Optional()]
         )
     assignedTo = SelectField('Assigned To', validators=[Optional()], coerce=int
         )    

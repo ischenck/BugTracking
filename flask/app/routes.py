@@ -171,7 +171,7 @@ def search():
     cursor.execute(sql)
     areas = cursor.fetchall()
     areas_list= [('',''),] + [(str(i[0]), str(i[0])) for i in areas]
-    form.functionalArea.choices = areas_list
+    form.areaName.choices = areas_list
 
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -179,7 +179,7 @@ def search():
                 "programId" : str(form.program.data),
                 "reportType" : str(form.reportType.data),
                 "severity" : str(form.severity.data),
-                "areaName" : str(form.functionalArea.data),
+                "areaName" : str(form.areaName.data),
                 "assignedTo" : str(form.assignedTo.data),
                 "status" : str(form.status.data),
                 "priority" : str(form.priority.data),
@@ -188,15 +188,16 @@ def search():
                 "discoveredDate" : str(form.discoveredDate.data),
                 "resolvedBy" : str(form.resolvedBy.data)
             }
-            print(allData)
             invalid = ('', '0', 'None')
             searchData = { key:val for key, val in allData.items() if val not in invalid}
             queryParams = ''.join('{} = {} AND '.format(key, val) for key, val in searchData.items())
+            sql = "SELECT * FROM BugReport" + (" WHERE " if queryParams else '') + queryParams[:-5]
             
+            cursor.execute(sql)
 
-            
+            reports = cursor.fetchall()
+            print(reports)
 
-            print(searchData)
             return redirect(url_for('search'))
 
 

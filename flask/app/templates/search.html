@@ -5,156 +5,218 @@
 <div class="container">
 <div class="row align-items center justify-content-center">
 <div class="col-md-4">
-<h3>Search bug reports</h3>
+    <h3>Search Bug Reports</h3>
+
 <div class="form-group">
  <form method="POST" action="/search/" role="form">
   {{ form.csrf_token }}
+    <table class="table">
+        <tbody>
+        
+        <tr>
+            <td>            
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Program</span>
+                    </div>
+                    {{ form.program(placeholder="program") }}
+                    {% if form.program.errors %}
+                      <span class="error">
+                        {% for error in form.program.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Report Type</span>
+                    </div>
+                    {{ form.reportType(placeholder="reportType") }}
+                    {% if form.reportType.errors %}
+                      <span class="error">
+                        {% for error in form.reportType.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                 </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Severity</span>
+                    </div>
+                    {{ form.severity(placeholder="severity") }}
+                    {% if form.severity.errors %}
+                      <span class="error">
+                        {% for error in form.severity.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </div>
+            </td>     
+        </tr>
 
-  <label for="program">Program:</label>
-  <div class="input-group">
-    {{ form.program(placeholder="program") }}
-    {% if form.program.errors %}
-      <span class="error">
-        {% for error in form.program.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
+        <tr>
+        </tr>
+        <tr>
+            <td>
+                <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Status</span>
+                </div>
+                {{ form.status(placeholder="status") }}
+                {% if form.status.errors %}
+                <span class="error">
+                    {% for error in form.status.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </span>
+                {% endif %}
+                </div>
+            
+            </td>
+            <td>
+                    <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Priority</span>
+                    </div>
+                    {{ form.priority(placeholder="priority") }}
+                    {% if form.priority.errors %}
+                        <span class="error">
+                        {% for error in form.priority.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        </span>
+                    {% endif %}
+                    </div>
+            </td>
+            <td>
+                    <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Resolution</span>
+                    </div>
+                    {{ form.resolution(placeholder="resolution") }}
+                    {% if form.resolution.errors %}
+                        <span class="error">
+                        {% for error in form.resolution.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        </span>
+                    {% endif %}
+                    </div>
+            </td>
+        </tr>
+        <tr>
 
-    <label for="reportType">Report Type: </label>
-  <div class="input-group">
-    {{ form.reportType(placeholder="reportType") }}
-    {% if form.reportType.errors %}
-      <span class="error">
-        {% for error in form.reportType.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  	<label for="severity">Severity: </label>
-  <div class="input-group">
-    {{ form.severity(placeholder="severity") }}
-    {% if form.severity.errors %}
-      <span class="error">
-        {% for error in form.severity.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="functionalArea">Functional Area: </label>
-  <div class="input-group">
-    {{ form.functionalArea(placeholder="functionalArea") }}
-    {% if form.functionalArea.errors %}
-      <span class="error">
-        {% for error in form.functionalArea.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="assignedTo">Assigned To: </label>
-  <div class="input-group">
-    {{ form.assignedTo(placeholder="assignedTo") }}
-    {% if form.assignedTo.errors %}
-      <span class="error">
-        {% for error in form.assignedTo.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="status">Status: </label>
-  <div class="input-group">
-    {{ form.status(placeholder="status") }}
-    {% if form.status.errors %}
-      <span class="error">
-        {% for error in form.status.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="priority">Priority: </label>
-  <div class="input-group">
-    {{ form.priority(placeholder="priority") }}
-    {% if form.priority.errors %}
-      <span class="error">
-        {% for error in form.priority.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
-
-  <label for="resolution">Resolution: </label>
-  <div class="input-group">
-    {{ form.resolution(placeholder="resolution") }}
-    {% if form.resolution.errors %}
-      <span class="error">
-        {% for error in form.resolution.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
+        </tr>
 
 
-  <label for="reportedBy">Reported By: </label>
-  <div class="input-group">
-    {{ form.reportedBy(placeholder="reportedBy") }}
-    {% if form.reportedBy.errors %}
-      <span class="error">
-        {% for error in form.reportedBy.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
+        <tr>
 
-  <label for="discoveredDate">Discovered Date: </label>
-  <div class="input-group">
-    {{ form.discoveredDate(placeholder="discoveredDate") }}
-    {% if form.discoveredDate.errors %}
-      <span class="error">
-        {% for error in form.discoveredDate.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
+        </tr>
 
-  <label for="resolvedBy">Resolved By: </label>
-  <div class="input-group">
-    {{ form.resolvedBy(placeholder="resolvedBy") }}
-    {% if form.resolvedBy.errors %}
-      <span class="error">
-        {% for error in form.resolvedBy.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>  
+        <tr>
 
-   <button class="btn btn-sm btn-success" type="submit">Search Bug Reports</button>
+        </tr>
+        <tr>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Functional Area</span>
+                    </div>
+                {{ form.areaName(placeholder="Functional Area") }}
+                {% if form.areaName.errors %}
+                    <span class="error">
+                    {% for error in form.areaName.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    </span>
+                {% endif %}
+                </div>                
+            </td>
+            <td>
+              <div class="input-group">
+                   <div class="input-group-prepend">
+                        <span class="input-group-text">Reported By</span>
+                  </div>
+                {{ form.reportedBy(placeholder="Reported By") }}
+                {% if form.reportedBy.errors %}
+                <span class="error">
+                    {% for error in form.reportedBy.errors %}
+                      {{ error }}
+                    {% endfor %}
+                </span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                        <span class="input-group-text">Discovered Date:</span>
+                  </div>
+                    {{ form.discoveredDate(placeholder="discoveredDate") }}
+                    {% if form.discoveredDate.errors %}
+                    <span class="error">
+                        {% for error in form.discoveredDate.errors %}
+                          {{ error }}
+                        {% endfor %}
+                    </span>
+                    {% endif %}
+                </div>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Assigned To</span>
+                  </div>
+                {{ form.assignedTo(placeholder="Assigned To") }}
+                {% if form.assignedTo.errors %}
+                  <span class="error">
+                    {% for error in form.assignedTo.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </span>
+                {% endif %}
+                </div>
+            </td>
+
+            <td>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Resolved By</span>
+                    </div>
+                    {{ form.resolvedBy(placeholder="resolvedBy") }}
+                    {% if form.resolvedBy.errors %}
+                    <span class="error">
+                        {% for error in form.resolvedBy.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </span>
+                    {% endif %}
+                </div>
+              </td>
+            <td></td>
+       
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+
+        </tr>
+        </tbody>
+    </table>
+
+
+   <button class="btn btn-sm btn-success" type="submit">Search Bug Report</button>
   <br>
 </form>
 </div>
