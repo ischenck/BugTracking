@@ -15,7 +15,7 @@ mysql = MySQL()
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -642,7 +642,7 @@ def upload():
         return redirect(url_for('index'))          
   
     else: flash('nothing')
-    return render_template('upload.html')
+    return render_template('upload.html', user=user_)
 
 '''
 Select all from the attachment table and place
