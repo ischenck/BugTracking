@@ -113,13 +113,13 @@ class addFuncAreaForm(FlaskForm):
 
 class addProgramForm(FlaskForm):
     programID = IntegerField(
-            'programId', validators = [DataRequired(), Length(min=1, max=40)])
+            'programId', validators = [DataRequired()])
     name = StringField(
             'name', validators = [DataRequired(), Length(min=1, max=40)])
     version = IntegerField(
-            'version', validators = [DataRequired(), Length(min=1, max=40)])
+            'version', validators = [DataRequired()])
     releaseNumber = IntegerField(
-            'releaseNumber', validators = [DataRequired(), Length(min=1, max=40)])
+            'releaseNumber', validators = [DataRequired()])
     description = StringField(
             'description', validators = [DataRequired(), Length(min=1, max=40)])
     

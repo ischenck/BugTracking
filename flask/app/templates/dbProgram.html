@@ -11,9 +11,14 @@
       
     <tr>
         <td>
-        <a href="{{ url_for('edit', id=row[0]) }}">{{ row[0] }}</a>
+        <a href="{{ url_for('editProgram', id=row[0]) }}">{{ row[0] }}</a>
         </td>
          <td>{{ row[1] }}</td>
+         <td>{{ row[2] }}</td>
+         <td>{{ row[3] }}</td>
+         <td>{{ row[4] }}</td>
+         <td>{{ row[5] }}</td>
+         
     </tr>
       
 {% endfor %}
@@ -22,6 +27,3 @@
 
 
 {% endblock %}
-
-
-    

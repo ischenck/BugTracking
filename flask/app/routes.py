@@ -54,10 +54,18 @@ def select():
 @app.route('/selectFunctionalArea')
 def selectFunctionalArea():
     cursor = mysql.connect().cursor()
-    sql = "select * from functionalarea"
+    sql = "select * from FunctionalArea"
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('dbFunctionalArea.html', results=results)
+
+@app.route('/selectProgram')
+def selectProgram():
+    cursor = mysql.connect().cursor()
+    sql = "select * from program"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return render_template('dbProgram.html', results = results)
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
@@ -65,7 +73,7 @@ def edit(id):
     con = mysql.connect()
     cursor = con.cursor()
 
-    sql = "select * from Employee where employeeId="+str(id)
+    sql = "SELECT * FROM Employee where employeeId="+str(id)
     cursor.execute(sql)
     results = cursor.fetchone()
     employeeString = results
@@ -114,19 +122,20 @@ def editFunctionalArea(id):
     form = addFuncAreaForm()
     con = mysql.connect()
     cursor = con.cursor()
+    word = "'" + str(id) + "'"
     
-    sql = "select * from functionalArea where areaName="+str(id)
+    sql = "SELECT * FROM FunctionalArea WHERE areaName=" + word
     cursor.execute(sql)
     results = cursor.fetchone()
     areaString = results
     
     if request.method == 'GET':
-        form.area.data = results[1]
+        form.area.data = results[0]
     elif request.method == 'POST':
         if form.validate_on_submit():
             editedArea = (str(form.area.data))
             try:
-                sql = "UPDATE functionalArea SET areaName=%s WHERE areaName=" + str(id)
+                sql = "UPDATE FunctionalArea SET areaName=%s WHERE areaName=" + word
                 cursor.execute(sql,editedArea)
                 con.commit()
                 return redirect(url_for('selectFunctionalArea'))
@@ -134,7 +143,43 @@ def editFunctionalArea(id):
                 print("problem" + str(e))
                 return redirect(url_for('selectFunctionalArea'))
             
-    return render_template('editFunctionalArea.html', results=areaString, form=form)
+    return render_template('editFunctionalArea.html',results = areaString, form=form)
+
+@app.route('/editProgram/<id>', methods = ['Get' , 'Post'])
+def editProgram(id):
+    form = addProgramForm()
+    con = mysql.connect()
+    cursor = con.cursor()
+    
+    sql = "SELECT * from Program WHERE programID=" +str(id)
+    cursor.execute(sql)
+    results = cursor.fetchone()
+    programIDString = results
+    
+    if request.method == 'GET':
+        form.programID.data=results[0]
+        form.name.data=results[1]
+        form.version.data=results[2]
+        form.releaseNumber.data=results[3]
+        form.description.data=results[4]
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            editedProgram = (str(form.programID.data),
+                             str(form.name.data),
+                             str(form.version.data),
+                             str(form.releaseNumber.data),
+                             str(form.description.data))
+            try:
+                sql = "UPDATE Program SET programID=%s, name=%s, version=%s, releaseNumber=%s, description=%s where programID=" +str(id)
+                cursor.execute(sql, editedProgram)
+                con.commit()
+                return redirect(url_for('selectProgram'))
+            except Exception as e:
+                print("problem" + str(e))
+                return redirect(url_for('selectProgram'))
+    
+    return render_template('editProgram.html', results = programIDString, form = form)
+    
     
 
 @app.route('/register/', methods=['GET', 'POST'])
@@ -179,7 +224,7 @@ def addFunctionalArea():
     con = mysql.connect()
     cursor = con.cursor()
     if request.method == 'POST':
-        sql = 'INSERT INTO functionalarea(areaName) VALUES (%s)'
+        sql = 'INSERT INTO FunctionalArea(areaName) VALUES (%s)'
         cursor.execute(sql, newArea)
         con.commit()
         return redirect(url_for('addFunctionalArea'))
