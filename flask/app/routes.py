@@ -1,14 +1,16 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm
+from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm
 from flaskext.mysql import MySQL
 from functools import wraps
-import os
+import os, sys
 import base64
+from app.user_object import User
 
 #from utils import *
 mysql = MySQL()
- 
+
+
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
@@ -16,34 +18,70 @@ app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
+user_ =User('fake',0)
+
+     
 @app.route('/')
 @app.route('/index')
 def index():
-    user = {'username': 'Miguel'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', user=user, posts=posts)
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    
+    return render_template('index.html', title='Home', user=user_)
 
 
-#@app.route('/login', methods=['GET', 'POST'])
-#def login():
-#    form = LoginForm()
-#    if form.validate_on_submit():
-#        flash('Login requested for user {}, remember_me={}'.format(
-#            form.username.data, form.remember_me.data))
-#        return redirect(url_for('index'))
-#    return render_template('login.html',  title='Sign In', form=form)
+# Route for handling the login page logic
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    result= None
+    
+    form = LoginForm()
+    con = mysql.connect()
+    cursor = con.cursor()
+    
+    if request.method == 'POST':
+    
+        if form.validate_on_submit():
+            validate = (
+                str(form.username.data), 
+                str(form.password.data)
+                )
+            try:
+                sql = "select * from Employee where username=%s and password=%s"
+                cursor.execute(sql, validate)
+                result = cursor.fetchall()
+                
+                print(len(result), file=sys.stderr)
+                if len(result) == 1:
+                    user_.username=result[0][2]
+                    user_.level = result[0][4]
+                    
+                    return redirect(url_for('index'))
+                else:
+                    error = 'Username or Password incorrect!'
+                
+            except Exception as e:
+                print(result, file=sys.stderr)
+                flash("Problem inserting into db: " + str(e))
+                return redirect(url_for('register'))
+    return render_template('login.html', error=error, form=form)
+
+
+    
+@app.route('/logout')
+def logout():
+    user_.username='fake'
+    user_.level=0
+    return redirect(url_for('login'))
 
 @app.route('/select')
 def select():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
+    
 #    conn = mysql.connect()
     cursor = mysql.connect().cursor()
     sql = "select * from Employee"
@@ -54,6 +92,12 @@ def select():
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
+    
+    
     form = EditForm()
     con = mysql.connect()
     cursor = con.cursor()
@@ -104,6 +148,11 @@ def edit(id):
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
+    if user_.level == 0:
+         return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
+    
     error = None
     form = RegisterForm(request.form)
     con = mysql.connect()
@@ -134,18 +183,18 @@ def register():
                 flash("Problem inserting into db: " + str(e))
                 return redirect(url_for('register'))
 
-    return render_template('register.html', form=form, error=error)
+    return render_template('register.html', form=form, error=error, user=user_)
 
 
 
-@app.route('/editEmployee/<guest>')
-def hello_guest(guest):
-   return 'Hello %s as Guest' % guest
 
 
 
 @app.route('/bug_report/', methods=['GET', 'POST'])
 def bug_report():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    
     error = None
     form = BugReportForm(request.form)
     con = mysql.connect()
@@ -254,7 +303,7 @@ def bug_report():
             #con.close()  
         else:
             print("bad!")
-    return render_template('bug_report.html', form=form, error=error)
+    return render_template('bug_report.html', form=form, error=error, user=user_)
 
 '''
 @app.route('/_get_program_info/')
@@ -275,12 +324,18 @@ def _get_program_info():
 
 @app.route('/upload')
 def upload_file():
-   return render_template('upload.html')
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    
+    return render_template('upload.html')
 
 
 @app.route('/uploader/', methods=['GET', 'POST'])
 def upload():
     #error = None
+    if user_.level == 0:
+        return redirect(url_for('login'))
+   
     if request.method == 'POST':
         f = request.files['inputFile']
         f.save(os.path.join('temp_file/',f.filename))
@@ -326,6 +381,8 @@ results in a table in attachments.html.
 '''
 @app.route('/attachments')
 def attachments():
+    if user_.level == 0:
+        return redirect(url_for('login'))
     cursor = mysql.connect().cursor()
     sql = "select * from Attachment"
     try:
@@ -333,7 +390,7 @@ def attachments():
         results = cursor.fetchall()
     except Exception as e:
         flash("Problem getting files: " + str(e))
-    return render_template('attachments.html', results=results)
+    return render_template('attachments.html', results=results, user=user_)
 
 '''
 When a file gets selected in attachments.html
@@ -343,6 +400,8 @@ renders it in view_attachment.html.
 '''
 @app.route('/showFile/<report>/<file>')
 def showFile(report,file):
+    if user_.level == 0:
+        return redirect(url_for('login'))
     cursor = mysql.connect().cursor()
      
     sql = "select * from Attachment where reportId=%s and fileName=%s"
