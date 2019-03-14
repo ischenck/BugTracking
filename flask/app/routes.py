@@ -320,13 +320,13 @@ def search():
                 reportsResult.append(''.join("{}: {} \n".format(key, val) for key, val in printableReports[i].items()))
 
             session['reports'] = reportsResult
-            return redirect(url_for('results'))
+            return render_template(('results.html'))
 
     return render_template('search.html', form=form, error=error, user=user_)
 
-@app.route('/results/')
-def results():
-    return render_template("results.html")
+#@app.route('/results/')
+#def results():
+#    return render_template("results.html")
 
 @app.route('/bug_report/', methods=['GET', 'POST'])
 def bug_report():
