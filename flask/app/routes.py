@@ -193,6 +193,8 @@ def register():
 
 @app.route('/search/', methods=['GET', 'POST'])
 def search():
+    if user_.level == 0:
+         return redirect(url_for('login'))
     error = None
     form = SearchForm(request.form)
     con = mysql.connect()
@@ -320,7 +322,7 @@ def search():
             session['reports'] = reportsResult
             return redirect(url_for('results'))
 
-    return render_template('search.html', form=form, error=error)
+    return render_template('search.html', form=form, error=error, user=user_)
 
 @app.route('/results/')
 def results():
