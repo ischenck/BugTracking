@@ -220,14 +220,21 @@ def register():
 def addFunctionalArea():
     error = None
     form = addFuncAreaForm(request.form)
-    newArea = (str(form.area.data))
+    #newArea = (str(form.area.data))
     con = mysql.connect()
     cursor = con.cursor()
     if request.method == 'POST':
-        sql = 'INSERT INTO FunctionalArea(areaName) VALUES (%s)'
-        cursor.execute(sql, newArea)
-        con.commit()
-        return redirect(url_for('addFunctionalArea'))
+        if form.validate_on_submit():
+            newArea = (str(form.area.data))
+            try:
+                sql = 'INSERT INTO FunctionalArea(areaName) VALUES (%s)'
+                cursor.execute(sql, newArea)
+                con.commit()
+                flash('New Function Added.')
+                return redirect(url_for('addFunctionalArea'))
+            except Exception as e:
+                flash("Problem inserting into Database: " + str(e))
+                return redirect(url_for('addFunctionalArea'))
     
     return render_template('addFunctionalArea.html', form=form, error=error)
 
@@ -243,10 +250,20 @@ def addProgram():
     con = mysql.connect()
     cursor = con.cursor()
     if request.method == 'POST':
-        sql = 'INSERT INTO program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
-        cursor.execute(sql,newProgram)
-        con.commit()
-        return redirect(url_for('addProgram'))
+        if form.validate_on_submit():
+            newProgram= (str(form.programID.data),
+                 str(form.name.data),
+                 str(form.version.data),
+                 str(form.releaseNumber.data),
+                 str(form.description.data))
+            try:
+                sql = 'INSERT INTO program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
+                cursor.execute(sql,newProgram)
+                con.commit()
+                return redirect(url_for('addProgram'))
+            except Exception as e:
+                flash("problem inserting into Database: " + str(e))
+                return redirect(url_for('addProgram'))
     return render_template('addProgram.html', form=form, error=error)
 
 
