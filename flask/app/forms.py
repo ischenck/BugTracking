@@ -146,3 +146,10 @@ class RegisterForm(FlaskForm):
         validators=[NumberRange(1, 4, "User Level must be between 1 and 4")]
     )
     functionalArea = SelectField('Functional Area', validators=[InputRequired()])
+
+class ExportForm(FlaskForm):
+    bugReport = BooleanField('Bug Report')
+    employee = BooleanField('Employee')
+    functionalArea = BooleanField('Functional Area')
+    program = BooleanField('Program')
+    attachment = BooleanField('Attachment')

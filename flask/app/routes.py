@@ -1,12 +1,13 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request, session
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm
+from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm, ExportForm
 
 from flaskext.mysql import MySQL
 from functools import wraps
-import os, sys
+import os, sys, gzip
 import base64
 from app.user_object import User
+import json
 
 #from utils import *
 mysql = MySQL()
@@ -17,6 +18,7 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 mysql.init_app(app)
 
 user_ =User('fake',0)
@@ -573,7 +575,6 @@ def showFile(report,file):
     return render_template('view_attachment.html', res=res, results=results, user=user_)
 
 
-
 '''
 helper functions to read and write files
 '''
@@ -592,6 +593,61 @@ def read_file(filename):
     return dat
 
 
+
+@app.route('/export/', methods=['GET', 'POST'])
+def export():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    
+    error = None
+    form = ExportForm(request.form)
+    
+    if request.method == 'POST':
+        con = mysql.connect()
+        cursor = con.cursor()
+        tables = []
+        if form.bugReport.data:
+            sql = "SELECT * FROM BugReport"
+            cursor.execute(sql)
+            bugReportTable = cursor.fetchall()
+            tables.append(bugReportTable)
+
+        if form.employee.data:
+            sql = "SELECT * FROM Employee"
+            cursor.execute(sql)
+            employeeTable = cursor.fetchall()
+            tables.append(employeeTable)
+
+        if form.functionalArea.data:
+            sql = "SELECT * FROM FunctionalArea"
+            cursor.execute(sql)
+            functionalAreaTable = cursor.fetchall()
+            tables.append(functionalAreaTable)
+
+        if form.program.data:
+            sql = "SELECT * FROM Program"
+            cursor.execute(sql)
+            programTable = cursor.fetchall()
+            tables.append(programTable)
+
+        if form.attachment.data:
+            sql = "SELECT reportID, fileName From Attachment"
+            cursor.execute(sql)
+            attachmentTable = cursor.fetchall()
+            tables.append(attachmentTable)
+
+
+        tablesJSON = jsonify(tables)
+        tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+        return tablesJSON
+
+
+                
+
+    return render_template('export.html', form=form, error=error, user=user_)
+
+    
+    
 
 
 
