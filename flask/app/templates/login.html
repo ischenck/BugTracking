@@ -1,14 +1,15 @@
 
-{% extends "base.html" %}
+{% extends "bootstrap/base.html" %}
 
 {% block content %}
 <div class="container">
     <h1>Sign In</h1>
-    <form action="" method="post" novalidate>
+    <form action="/login" method="post">
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>
+            
             {% for error in form.username.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
@@ -20,8 +21,14 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p>
+     
+       
+        <button class="btn btn-sm btn-success" type="submit">Login</button>
+        <p>
+           {% if error != None %}
+            <span style="color: red;">{{ error }}</span>
+           {% endif %}
+        </p>
     </form>
 
 </div>

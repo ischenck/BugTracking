@@ -1,5 +1,0 @@
-﻿1) I will add Tony’s attachment stuff to the main bug report
-2) we need a search page that meets the criteria in the slides, I can also work on that
-3) we need to export bug reports to xml, ascii, or JSON (json would probably be easiest)
-4) Victor, you need to finish the functional area add/edit and program add/edit
-

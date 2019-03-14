@@ -1,10 +1,19 @@
-{% extends "base.html" %}
 
+
+
+{% if user.level == 1 %}
+{% extends "base_user.html" %}
+{% endif %}
+{% if user.level == 2 %}
+{% extends "base.html" %}
+{% endif %}
 
 
 {% block content %}
+Logged in as: {{user.username}}
 <div class="jumbotron">
   <h1>Welcome to Bug Hound!</h1>
+
 </div>
 {% endblock %}
 
