@@ -94,19 +94,27 @@ def select():
 
 @app.route('/selectFunctionalArea')
 def selectFunctionalArea():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
     cursor = mysql.connect().cursor()
     sql = "select * from FunctionalArea"
     cursor.execute(sql)
     results = cursor.fetchall()
-    return render_template('dbFunctionalArea.html', results=results)
+    return render_template('dbFunctionalArea.html', results=results, user = user_)
 
 @app.route('/selectProgram')
 def selectProgram():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
     cursor = mysql.connect().cursor()
     sql = "select * from Program"
     cursor.execute(sql)
     results = cursor.fetchall()
-    return render_template('dbProgram.html', results = results)
+    return render_template('dbProgram.html', results = results, user=user_)
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
@@ -166,6 +174,11 @@ def edit(id):
 
 @app.route('/editFunctionalArea/<id>', methods =['GET' , 'POST'])
 def editFunctionalArea(id):
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
+
     form = addFuncAreaForm()
     con = mysql.connect()
     cursor = con.cursor()
@@ -194,6 +207,11 @@ def editFunctionalArea(id):
 
 @app.route('/editProgram/<id>', methods = ['Get' , 'Post'])
 def editProgram(id):
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
+
     form = addProgramForm()
     con = mysql.connect()
     cursor = con.cursor()
@@ -269,6 +287,10 @@ def register():
 
 @app.route('/addFunctionalArea', methods=['GET','POST'])
 def addFunctionalArea():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
     error = None
     form = addFuncAreaForm(request.form)
     #newArea = (str(form.area.data))
@@ -291,6 +313,10 @@ def addFunctionalArea():
 
 @app.route('/addProgram', methods=['GET', 'POST'])
 def addProgram():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    if user_.level != 2:
+         return redirect(url_for('index'))
     error = None
     form = addProgramForm(request.form)
     newProgram= (
