@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block content %}
+ 
+<div class="container">
+<div class="row align-items center justify-content-center">
+<div class="col-md-4">
+<h3>Add New Program ID</h3>
+<div class="form-group">
+ <form method="POST" action="/addProgram" role="form">
+  {{ form.csrf_token }}
+     <label for="Program ID">Program ID:</label>
+  <div class="input-group">
+    {{ form.programID(placeholder="ID") }}
+    {% if form.programID.errors %}
+      <span class="error">
+        {% for error in form.programID.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <br>
+    <label for="name">name:</label>
+  <div class="input-group">
+    {{ form.name(placeholder="name") }}
+    {% if form.name.errors %}
+      <span class="error">
+        {% for error in form.name.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <br>
+    <label for="version">version:</label>
+
+  <div class="input-group">
+    {{ form.version(placeholder="version #") }}
+    {% if form.version.errors %}
+      <span class="error">
+        {% for error in form.version.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <br>
+    <label for="release Number">release Number:</label>
+  <div class="input-group">
+    {{ form.releaseNumber(placeholder="release #") }}
+    {% if form.releaseNumber.errors %}
+      <span class="error">
+        {% for error in form.releaseNumber.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <br>
+  <label for="Description">Description:</label>
+  <div class="input-group">
+    {{ form.description(placeholder="description") }}
+    {% if form.description.errors %}
+      <span class="error">
+        {% for error in form.description.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  <br>
+
+   <button class="btn btn-sm btn-success" type="submit">Add new Program</button>
+  <br>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+
+{% endblock %}

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request, session
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm, ExportForm
+from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm, ExportForm, addFuncAreaForm, addProgramForm
 
 from flaskext.mysql import MySQL
 from functools import wraps
@@ -15,7 +15,7 @@ mysql = MySQL()
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -92,6 +92,21 @@ def select():
     results = cursor.fetchall()
     return render_template('db.html', results=results)
 
+@app.route('/selectFunctionalArea')
+def selectFunctionalArea():
+    cursor = mysql.connect().cursor()
+    sql = "select * from FunctionalArea"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return render_template('dbFunctionalArea.html', results=results)
+
+@app.route('/selectProgram')
+def selectProgram():
+    cursor = mysql.connect().cursor()
+    sql = "select * from Program"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    return render_template('dbProgram.html', results = results)
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
@@ -105,7 +120,7 @@ def edit(id):
     con = mysql.connect()
     cursor = con.cursor()
 
-    sql = "select * from Employee where employeeId="+str(id)
+    sql = "SELECT * FROM Employee where employeeId="+str(id)
     cursor.execute(sql)
     results = cursor.fetchone()
     employeeString = results
@@ -149,6 +164,71 @@ def edit(id):
     
     return render_template('edit.html', results=employeeString, form=form)
 
+@app.route('/editFunctionalArea/<id>', methods =['GET' , 'POST'])
+def editFunctionalArea(id):
+    form = addFuncAreaForm()
+    con = mysql.connect()
+    cursor = con.cursor()
+    word = "'" + str(id) + "'"
+    
+    sql = "SELECT * FROM FunctionalArea WHERE areaName=" + word
+    cursor.execute(sql)
+    results = cursor.fetchone()
+    areaString = results
+    
+    if request.method == 'GET':
+        form.area.data = results[0]
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            editedArea = (str(form.area.data))
+            try:
+                sql = "UPDATE FunctionalArea SET areaName=%s WHERE areaName=" + word
+                cursor.execute(sql,editedArea)
+                con.commit()
+                return redirect(url_for('selectFunctionalArea'))
+            except Exception as e:
+                print("problem" + str(e))
+                return redirect(url_for('selectFunctionalArea'))
+            
+    return render_template('editFunctionalArea.html',results = areaString, form=form)
+
+@app.route('/editProgram/<id>', methods = ['Get' , 'Post'])
+def editProgram(id):
+    form = addProgramForm()
+    con = mysql.connect()
+    cursor = con.cursor()
+    
+    sql = "SELECT * from Program WHERE programID=" +str(id)
+    cursor.execute(sql)
+    results = cursor.fetchone()
+    programIDString = results
+    
+    if request.method == 'GET':
+        form.programID.data=results[0]
+        form.name.data=results[1]
+        form.version.data=results[2]
+        form.releaseNumber.data=results[3]
+        form.description.data=results[4]
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            editedProgram = (str(form.programID.data),
+                             str(form.name.data),
+                             str(form.version.data),
+                             str(form.releaseNumber.data),
+                             str(form.description.data))
+            try:
+                sql = "UPDATE Program SET programID=%s, name=%s, version=%s, releaseNumber=%s, description=%s where programID=" +str(id)
+                cursor.execute(sql, editedProgram)
+                con.commit()
+                return redirect(url_for('selectProgram'))
+            except Exception as e:
+                print("problem" + str(e))
+                return redirect(url_for('selectProgram'))
+    
+    return render_template('editProgram.html', results = programIDString, form = form)
+    
+    
+
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     if user_.level == 0:
@@ -188,6 +268,55 @@ def register():
 
     return render_template('register.html', form=form, error=error, user=user_)
 
+@app.route('/addFunctionalArea', methods=['GET','POST'])
+def addFunctionalArea():
+    error = None
+    form = addFuncAreaForm(request.form)
+    #newArea = (str(form.area.data))
+    con = mysql.connect()
+    cursor = con.cursor()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            newArea = (str(form.area.data))
+            try:
+                sql = 'INSERT INTO FunctionalArea(areaName) VALUES (%s)'
+                cursor.execute(sql, newArea)
+                con.commit()
+                flash('New Function Added.')
+                return redirect(url_for('addFunctionalArea'))
+            except Exception as e:
+                flash("Problem inserting into Database: " + str(e))
+                return redirect(url_for('addFunctionalArea'))
+    
+    return render_template('addFunctionalArea.html', form=form, error=error)
+
+@app.route('/addProgram', methods=['GET', 'POST'])
+def addProgram():
+    error = None
+    form = addProgramForm(request.form)
+    newProgram= (str(form.programID.data),
+                 str(form.name.data),
+                 str(form.version.data),
+                 str(form.releaseNumber.data),
+                 str(form.description.data))
+    con = mysql.connect()
+    cursor = con.cursor()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            newProgram= (str(form.programID.data),
+                 str(form.name.data),
+                 str(form.version.data),
+                 str(form.releaseNumber.data),
+                 str(form.description.data))
+            try:
+                sql = 'INSERT INTO Program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
+                cursor.execute(sql,newProgram)
+                con.commit()
+                return redirect(url_for('addProgram'))
+            except Exception as e:
+                flash("problem inserting into Database: " + str(e))
+                return redirect(url_for('addProgram'))
+    return render_template('addProgram.html', form=form, error=error)
 
 
 

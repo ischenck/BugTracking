@@ -147,9 +147,26 @@ class RegisterForm(FlaskForm):
     )
     functionalArea = SelectField('Functional Area', validators=[InputRequired()])
 
+class addFuncAreaForm(FlaskForm):
+    area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
+
+class addProgramForm(FlaskForm):
+    programID = IntegerField(
+            'programId', validators = [DataRequired()])
+    name = StringField(
+            'name', validators = [DataRequired(), Length(min=1, max=40)])
+    version = IntegerField(
+            'version', validators = [DataRequired()])
+    releaseNumber = IntegerField(
+            'releaseNumber', validators = [DataRequired()])
+    description = StringField(
+            'description', validators = [DataRequired(), Length(min=1, max=40)])
+    
+
 class ExportForm(FlaskForm):
     bugReport = BooleanField('Bug Report')
     employee = BooleanField('Employee')
     functionalArea = BooleanField('Functional Area')
     program = BooleanField('Program')
     attachment = BooleanField('Attachment')
+
