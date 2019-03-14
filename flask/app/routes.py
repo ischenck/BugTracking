@@ -204,20 +204,19 @@ def editProgram(id):
     programIDString = results
     
     if request.method == 'GET':
-        form.programID.data=results[0]
         form.name.data=results[1]
         form.version.data=results[2]
         form.releaseNumber.data=results[3]
         form.description.data=results[4]
     elif request.method == 'POST':
         if form.validate_on_submit():
-            editedProgram = (str(form.programID.data),
+            editedProgram = (
                              str(form.name.data),
                              str(form.version.data),
                              str(form.releaseNumber.data),
                              str(form.description.data))
             try:
-                sql = "UPDATE Program SET programID=%s, name=%s, version=%s, releaseNumber=%s, description=%s where programID=" +str(id)
+                sql = "UPDATE Program SET name=%s, version=%s, releaseNumber=%s, description=%s where programID=" +str(id)
                 cursor.execute(sql, editedProgram)
                 con.commit()
                 return redirect(url_for('selectProgram'))
@@ -294,7 +293,7 @@ def addFunctionalArea():
 def addProgram():
     error = None
     form = addProgramForm(request.form)
-    newProgram= (str(form.programID.data),
+    newProgram= (
                  str(form.name.data),
                  str(form.version.data),
                  str(form.releaseNumber.data),
@@ -303,13 +302,13 @@ def addProgram():
     cursor = con.cursor()
     if request.method == 'POST':
         if form.validate_on_submit():
-            newProgram= (str(form.programID.data),
+            newProgram= (
                  str(form.name.data),
                  str(form.version.data),
                  str(form.releaseNumber.data),
                  str(form.description.data))
             try:
-                sql = 'INSERT INTO Program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
+                sql = 'INSERT INTO Program(name, version, releaseNumber, description) VALUES(%s, %s, %s, %s)'
                 cursor.execute(sql,newProgram)
                 con.commit()
                 return redirect(url_for('addProgram'))
