@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
+from flask import Flask, render_template, flash, redirect, url_for, jsonify, request, session
 from app import app
 from app.forms import EditForm, RegisterForm, BugReportForm, SearchForm
 from flaskext.mysql import MySQL
@@ -173,6 +173,10 @@ def search():
     areas_list= [('',''),] + [(str(i[0]), str(i[0])) for i in areas]
     form.areaName.choices = areas_list
 
+    sql = "SELECT reportId, fileName FROM Attachment"
+    cursor.execute(sql)
+    attachments = cursor.fetchall()
+    print(attachments)
     if request.method == 'POST':
         if form.validate_on_submit():
             allData = {
@@ -193,17 +197,87 @@ def search():
             queryParams = ''.join('{} = {} AND '.format(key, val) for key, val in searchData.items())
             sql = "SELECT * FROM BugReport" + (" WHERE " if queryParams else '') + queryParams[:-5]
             
+            reportTypeDict = {
+                0: '', 
+                1: "Coding Error",
+                2: "Suggestions",
+                3: "Documentation",
+                4: "Hardware",
+                5: "Query" 
+            }
+            severityDict = {
+                0: '',
+                1: 'Fatal',
+                2: 'Serious',
+                3: 'Minor'
+            }
+            priorityDict = {
+                0: '',
+                1: "Fix immediately", 
+                2: "Fix as soon as possible", 
+                3: "Fix before next milestone",
+                4: "Fix before release", 
+                5: "Fix if possible)", 
+                6: "Optional"
+            }
+            resolutionDict = {
+                0: '', 
+                1: "Pending",
+                2: "Fixed",
+                3: "Irreproducible", 
+                4: "Deferred", 
+                5: "As designed",
+                6: "Withdrawn by reporter", 
+                7: "Need more info",
+                8: "Disagree with suggestion",
+                9: "Duplicate"
+            }
+            programDict = dict(programList)
+            employeesDict = dict(employees)
+            attachmentsDict = dict(attachments)
+
             cursor.execute(sql)
 
             reports = cursor.fetchall()
-            print(reports)
+            printableReports = []
+            for i in range(len(reports)):
+                printableReports.append({
+                    "Program": programDict.get(reports[i][1]),
+                    "Report Type": reportTypeDict.get(reports[i][2]),
+                    "Severity": severityDict.get(reports[i][3]),
+                    "Summary": reports[i][4],
+                    "Reproducable": "Yes" if reports[i][5] == 1 else "No",
+                    "Description": reports[i][6],
+                    "Suggested Fix": reports[i][7],
+                    "Reported By": employeesDict.get(reports[i][8]),
+                    "Discovered Date": reports[i][9],
+                    "Assigned To": employeesDict.get(reports[i][10]),
+                    "Comments": reports[i][11],
+                    "Status": "Open" if reports[i][12] == 1 else "Closed",
+                    "Priority": priorityDict.get(reports[i][13]),
+                    "Resolution": resolutionDict.get(reports[i][14]),
+                    "Resolution Version": reports[i][15],
+                    "Resolved By": employeesDict.get(reports[i][16]),
+                    "Resolved Date": reports[i][17],
+                    "Tested By": employeesDict.get(reports[i][18]),
+                    "Test Date": reports[i][19],
+                    "Deferred": "Yes" if reports[i][20] == 1 else "No",
+                    "Functional Area": reports[i][21],
+                    "Attachment": attachmentsDict.get(reports[i][0], 'None')
+                })
 
-            return redirect(url_for('search'))
+            reportsResult = []
+            for i in range(len(printableReports)):
+                reportsResult.append(''.join("{}: {} \n".format(key, val) for key, val in printableReports[i].items()))
 
+            session['reports'] = reportsResult
+            return redirect(url_for('results'))
 
- 
     return render_template('search.html', form=form, error=error)
 
+@app.route('/results/')
+def results():
+    return render_template("results.html")
 
 @app.route('/bug_report/', methods=['GET', 'POST'])
 def bug_report():
