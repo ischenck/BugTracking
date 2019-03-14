@@ -151,8 +151,8 @@ class addFuncAreaForm(FlaskForm):
     area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
 
 class addProgramForm(FlaskForm):
-    programID = IntegerField(
-            'programId', validators = [DataRequired()])
+    #programID = IntegerField(
+    #        'programId', validators = [DataRequired()])
     name = StringField(
             'name', validators = [DataRequired(), Length(min=1, max=40)])
     version = IntegerField(

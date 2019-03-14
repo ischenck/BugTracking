@@ -6,19 +6,9 @@
   <h3>View Edit Program {{results[0]}}</h3>
   <form action="" method="post" novalidate>
    {{ form.csrf_token }}
-   <label for="programID">programID:</label>
-  <div class="input-group">
-    {{ form.programID(placeholder="programID") }}
-    {% if form.programID.errors %}
-      <span class="error">
-        {% for error in form.programID.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
+   
   <br>
-  <label for"name">name:</label>
+  <label for"name">PRogram Name:</label>
   <div class="input-group">
     {{ form.name(placeholder="Program Name") }}
     {% if form.name.errors %}
@@ -30,7 +20,7 @@
     {% endif %}
   </div>
   <br>
-  <label for="version">version:</label>
+  <label for="version">Version:</label>
   <div class="input-group">
     {{ form.version(placeholder="version") }}
     {% if form.version.errors %}
@@ -42,7 +32,7 @@
     {% endif %}
   </div>
   <br>
-  <label for="releaseNumber">User Level:</label>
+  <label for="releaseNumber">Release Number:</label>
   <div class="input-group">
     {{ form.releaseNumber(placeholder="releaseNumber") }}
     {% if form.releaseNumber.errors %}
@@ -54,7 +44,7 @@
     {% endif %}
   </div>
   <br>
-    <label for="description">description:</label>
+    <label for="description">Description:</label>
   <div class="input-group">
     {{ form.description(placeholder="description") }}
     {% if form.description.errors %}

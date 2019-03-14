@@ -9,19 +9,8 @@
 <div class="form-group">
  <form method="POST" action="/addProgram" role="form">
   {{ form.csrf_token }}
-     <label for="Program ID">Program ID:</label>
-  <div class="input-group">
-    {{ form.programID(placeholder="ID") }}
-    {% if form.programID.errors %}
-      <span class="error">
-        {% for error in form.programID.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
   <br>
-    <label for="name">name:</label>
+    <label for="name">Program Name:</label>
   <div class="input-group">
     {{ form.name(placeholder="name") }}
     {% if form.name.errors %}
@@ -33,7 +22,7 @@
     {% endif %}
   </div>
   <br>
-    <label for="version">version:</label>
+    <label for="version">Version:</label>
 
   <div class="input-group">
     {{ form.version(placeholder="version #") }}
@@ -46,7 +35,7 @@
     {% endif %}
   </div>
   <br>
-    <label for="release Number">release Number:</label>
+    <label for="release Number">Release Number:</label>
   <div class="input-group">
     {{ form.releaseNumber(placeholder="release #") }}
     {% if form.releaseNumber.errors %}
@@ -71,7 +60,7 @@
   </div>
   <br>
 
-   <button class="btn btn-sm btn-success" type="submit">Add new Program</button>
+   <button class="btn btn-sm btn-success" type="submit">Add New Program</button>
   <br>
 </form>
 </div>
