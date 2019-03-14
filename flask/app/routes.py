@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request, session
 from app import app
-from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm
+from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm, ExportForm
 
 from flaskext.mysql import MySQL
 from functools import wraps
@@ -573,7 +573,6 @@ def showFile(report,file):
     return render_template('view_attachment.html', res=res, results=results, user=user_)
 
 
-
 '''
 helper functions to read and write files
 '''
@@ -592,6 +591,58 @@ def read_file(filename):
     return dat
 
 
+
+@app.route('/export/', methods=['GET', 'POST'])
+def export():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    
+    error = None
+    form = ExportForm(request.form)
+    
+    if request.method == 'POST':
+        con = mysql.connect()
+        cursor = con.cursor()
+        if form.bugReport.data:
+            sql = "SELECT * FROM BugReport"
+            cursor.execute(sql)
+            bugReportTable = cursor.fetchall()
+            bugReportJSON = jsonify(bugReportTable)
+            bugReportJSON.headers['Content-Disposition'] = 'attachment;filename=bugreport.json'
+            return bugReportJSON
+        if form.employee.data:
+            sql = "SELECT * FROM Employee"
+            cursor.execute(sql)
+            employeeTable = cursor.fetchall()
+            employeeJSON = jsonify(employeeTable)
+            employeeJSON.headers['Content-Disposition'] = 'attachment;filename=employee.json'
+            return employeeJSON
+        if form.functionalArea.data:
+            sql = "SELECT * FROM FunctionalArea"
+            cursor.execute(sql)
+            functionalAreaTable = cursor.fetchall()
+            functionalAreaJSON = jsonify(functionalAreaTable)
+            functionalAreaJSON.headers['Content-Disposition'] = 'attachment;filename=functionalArea.json'
+            return functionalAreaJSON
+        if form.program.data:
+            sql = "SELECT * FROM Program"
+            cursor.execute(sql)
+            programTable = cursor.fetchall()
+            programJSON = jsonify(programTable)
+            programJSON.headers['Content-Disposition'] = 'attachment;filename=program.json'
+            return programJSON
+        if form.attachment.data:
+            sql = "SELECT reportID, fileName From Attachment"
+            cursor.execute(sql)
+            attachmentTable = cursor.fetchall()
+            attachmentJSON = jsonify(attachmentTable)
+            attachmentJSON.headers['Content-Disposition'] = 'attachment;filename=attachment.json'
+            return attachmentJSON
+
+    return render_template('export.html', form=form, error=error, user=user_)
+
+    
+    
 
 
 
