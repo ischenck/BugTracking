@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, DateField, PasswordField, BooleanField, SubmitField, IntegerField, SelectField
-from wtforms.validators import DataRequired, EqualTo, NumberRange, Length, InputRequired
+from wtforms.validators import DataRequired, EqualTo, NumberRange, Length, InputRequired, Optional
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from datetime import date
 #we are going to need some login form for another page so keep for now
@@ -13,6 +13,43 @@ class LoginForm(FlaskForm):
 #    
 #    
 
+class SearchForm(FlaskForm):
+    program = SelectField('Program', validators=[Optional()], coerce=int
+        )
+
+    reportType = SelectField("Report Type", choices=[(0,''), (1, "Coding Error"), 
+        (2, "Suggestion"), (3, "Documentation"), 
+        (4, "Hardware"), (5, "Query")
+        ], default='', validators=[Optional()], coerce=int
+        )
+    severity = SelectField("Severity", choices=[(0,''), (3, "Minor"), 
+        (2, "Serious"), 
+        (1, "Fatal")], default='', validators=[Optional()], coerce=int
+        )
+    
+    areaName = SelectField('Functional Area', validators=[Optional()]
+        )
+    assignedTo = SelectField('Assigned To', validators=[Optional()], coerce=int
+        )    
+    status = SelectField("Status", choices=[(0,''), (1, "Open"), (2, "Closed")], default='', validators=[Optional()], coerce=int
+        )
+    priority = SelectField("Priority", choices=[(0,''), (1, "Fix immediately"), 
+        (2, "Fix as soon as possible"), (3, "Fix before next milestone"),
+        (4, "Fix before release"), (5, "Fix if possible"), 
+        (6, "Optional")], default='', validators=[Optional()], coerce=int
+        )
+    resolution = SelectField("Resolution", choices=[(0,''), (1, "Pending"), (2, "Fixed"),
+        (3, "Irreproducible"), (4, "Deferred"), (5, "As designed"),
+        (6, "Withdrawn by reporter"), (7, "Need more info"),
+        (8, "Disagree with suggestion"), (9, "Duplicate")], default='', 
+        validators=[Optional()], coerce=int
+        ) 
+    reportedBy = SelectField('Reported By', validators=[Optional()], coerce=int
+        )
+    discoveredDate = DateField('Discovered Date', validators=[Optional()], default=''
+        )       
+    resolvedBy = SelectField("Resolved By", validators=[Optional()], coerce=int
+        )
 
 class BugReportForm(FlaskForm):
     program = SelectField('Program', validators=[InputRequired()], coerce=int
