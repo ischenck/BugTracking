@@ -191,6 +191,8 @@ def search():
             print(allData)
             invalid = ('', '0', 'None')
             searchData = { key:val for key, val in allData.items() if val not in invalid}
+            queryParams = ''.join('{} = {} AND '.format(key, val) for key, val in searchData.items())
+            
 
             
 
