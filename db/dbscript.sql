@@ -1,9 +1,10 @@
-#drop  database bughound;
+#AttachmentAttachmentdrop  database bughound;
 #drop table Attachment;
 #drop table BugReport;
 #drop table Program;
 #drop table Employee;
 #drop table FunctionalArea;
+
 
 create database bughound;
 use bughound;
@@ -55,7 +56,9 @@ create table BugReport(
     testedBy int(10) not null,
     testedDate date not null,
     deferred boolean not null,
+    areaName varchar(40) not null,
     primary key (reportId),
+    foreign key (areaName) references FunctionalArea(areaName),
     foreign key (programID) references Program(programId),
     foreign key (reportedBy) references Employee(employeeId),
     foreign key (assignedTo) references Employee(employeeId),
@@ -83,6 +86,6 @@ insert into Employee values(null, 'John House','john','password', 2,  'Software'
 insert into Program values(null,'Space Fighter', '1','1','Galactic Fighter');
 insert into Program values(null,'Street Fighter', '1','1','2d console fighter');
 
-insert into BugReport values(null,1,1,1,"summary",true,"test dat","fix nothing",1,'1990-1-1',2,"no comments",1,1,1,111,2,'1990-1-1',1,'1990-1-1',false);
+insert into BugReport values(null,1,1,1,"summary",true,"test dat","fix nothing",1,'1990-1-1',2,"no comments",1,1,1,111,2,'1990-1-1',1,'1990-1-1',false, "Software");
     
 

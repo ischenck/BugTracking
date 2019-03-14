@@ -75,6 +75,8 @@ class BugReportForm(FlaskForm):
         )
     discoveredDate = DateField('Discovered Date', default=date.today
         )
+    areaName = SelectField("Fuctional Area",  validators=[InputRequired()]
+        )
     assignedTo = SelectField('Assigned To', validators=[InputRequired()], coerce=int
         )
     comments = StringField("comments", validators=[DataRequired(), Length(min=1, max=400)]
