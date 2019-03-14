@@ -4,9 +4,10 @@ from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchFo
 
 from flaskext.mysql import MySQL
 from functools import wraps
-import os, sys
+import os, sys, gzip
 import base64
 from app.user_object import User
+import json
 
 #from utils import *
 mysql = MySQL()
@@ -17,6 +18,7 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 mysql.init_app(app)
 
 user_ =User('fake',0)
@@ -603,41 +605,44 @@ def export():
     if request.method == 'POST':
         con = mysql.connect()
         cursor = con.cursor()
+        tables = []
         if form.bugReport.data:
             sql = "SELECT * FROM BugReport"
             cursor.execute(sql)
             bugReportTable = cursor.fetchall()
-            bugReportJSON = jsonify(bugReportTable)
-            bugReportJSON.headers['Content-Disposition'] = 'attachment;filename=bugreport.json'
-            return bugReportJSON
+            tables.append(bugReportTable)
+
         if form.employee.data:
             sql = "SELECT * FROM Employee"
             cursor.execute(sql)
             employeeTable = cursor.fetchall()
-            employeeJSON = jsonify(employeeTable)
-            employeeJSON.headers['Content-Disposition'] = 'attachment;filename=employee.json'
-            return employeeJSON
+            tables.append(employeeTable)
+
         if form.functionalArea.data:
             sql = "SELECT * FROM FunctionalArea"
             cursor.execute(sql)
             functionalAreaTable = cursor.fetchall()
-            functionalAreaJSON = jsonify(functionalAreaTable)
-            functionalAreaJSON.headers['Content-Disposition'] = 'attachment;filename=functionalArea.json'
-            return functionalAreaJSON
+            tables.append(functionalAreaTable)
+
         if form.program.data:
             sql = "SELECT * FROM Program"
             cursor.execute(sql)
             programTable = cursor.fetchall()
-            programJSON = jsonify(programTable)
-            programJSON.headers['Content-Disposition'] = 'attachment;filename=program.json'
-            return programJSON
+            tables.append(programTable)
+
         if form.attachment.data:
             sql = "SELECT reportID, fileName From Attachment"
             cursor.execute(sql)
             attachmentTable = cursor.fetchall()
-            attachmentJSON = jsonify(attachmentTable)
-            attachmentJSON.headers['Content-Disposition'] = 'attachment;filename=attachment.json'
-            return attachmentJSON
+            tables.append(attachmentTable)
+
+
+        tablesJSON = jsonify(tables)
+        tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+        return tablesJSON
+
+
+                
 
     return render_template('export.html', form=form, error=error, user=user_)
 
