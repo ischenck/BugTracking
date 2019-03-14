@@ -84,7 +84,7 @@ def select():
     
 #    conn = mysql.connect()
     cursor = mysql.connect().cursor()
-    sql = "select * from employee"
+    sql = "select * from Employee"
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('db.html', results=results)
@@ -100,7 +100,7 @@ def selectFunctionalArea():
 @app.route('/selectProgram')
 def selectProgram():
     cursor = mysql.connect().cursor()
-    sql = "select * from program"
+    sql = "select * from Program"
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('dbProgram.html', results = results)
@@ -306,7 +306,7 @@ def addProgram():
                  str(form.releaseNumber.data),
                  str(form.description.data))
             try:
-                sql = 'INSERT INTO program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
+                sql = 'INSERT INTO Program(programId, name, version, releaseNumber, description) VALUES(%s, %s, %s, %s, %s)'
                 cursor.execute(sql,newProgram)
                 con.commit()
                 return redirect(url_for('addProgram'))
