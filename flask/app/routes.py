@@ -15,7 +15,7 @@ mysql = MySQL()
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -144,6 +144,8 @@ def edit(id):
         form.functionalArea.choices = areas_list
     elif request.method == 'POST':
         form.functionalArea.choices = areas_list
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('select'))
         if form.validate_on_submit():
             print('redirect on submit')
             editedEmployee = (
@@ -179,6 +181,8 @@ def editFunctionalArea(id):
     if request.method == 'GET':
         form.area.data = results[0]
     elif request.method == 'POST':
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('selectFunctionalArea'))
         if form.validate_on_submit():
             editedArea = (str(form.area.data))
             try:
@@ -209,6 +213,8 @@ def editProgram(id):
         form.releaseNumber.data=results[3]
         form.description.data=results[4]
     elif request.method == 'POST':
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('selectProgram'))
         if form.validate_on_submit():
             editedProgram = (
                              str(form.name.data),
@@ -246,6 +252,8 @@ def register():
     form.functionalArea.choices = areas_list
     if request.method == 'POST':
         form.functionalArea.choices = areas_list
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('register'))
         if form.validate_on_submit():
             newEmployee = (
                 str(form.name.data), 
@@ -275,6 +283,8 @@ def addFunctionalArea():
     con = mysql.connect()
     cursor = con.cursor()
     if request.method == 'POST':
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('addFunctionalArea'))
         if form.validate_on_submit():
             newArea = (str(form.area.data))
             try:
@@ -301,6 +311,8 @@ def addProgram():
     con = mysql.connect()
     cursor = con.cursor()
     if request.method == 'POST':
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('addProgram'))
         if form.validate_on_submit():
             newProgram= (
                  str(form.name.data),
@@ -509,6 +521,8 @@ def bug_report():
     #if  request.method == 'GET':
     #   return render_template('bug_report.html', form=form, error=error)
     if request.method == 'POST':
+        if 'cancel' == request.form.get('cancel'):
+            return redirect(url_for('bug_report'))
         if form.validate_on_submit():
             print("good!")
             #f = form.attachment.data
