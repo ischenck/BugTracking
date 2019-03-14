@@ -570,7 +570,7 @@ def showFile(report,file):
     
 #    res.append(os.path.join('temp_file/',results[0][1]))
     
-    return render_template('view_attachment.html', res=res, results=results)
+    return render_template('view_attachment.html', res=res, results=results, user=user_)
 
 
 
