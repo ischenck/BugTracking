@@ -3,9 +3,23 @@
 {% block content %}
  
  <div class="container">
-  <h3>View Edit Functional Area {{results[0]}}</h3>
+  <h3>Edit Functional Area</h3>
   <form action="" method="post" novalidate>
    {{ form.csrf_token }}
+   
+   <label for="Program">Program:</label>
+  <div class="input-group">
+    {{ form.program(placeholder="program") }}
+    {% if form.program.errors %}
+      <span class="error">
+        {% for error in form.program.errors %}
+          {{ error }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+  
+  
    <label for="FunctionalArea">FunctionalArea:</label>
   <div class="input-group">
     {{ form.area(placeholder="area") }}
@@ -17,7 +31,17 @@
       </span>
     {% endif %}
   </div>
-  
+  <div>
+ {% with messages = get_flashed_messages(category_filter=["edit_function_error"]) %}
+  {% if messages %}
+    
+    {% for message in messages %}
+      <span  class="{{ edit_function_error }}" style="color: red;">{{ message }}</span>
+    {% endfor %}
+    
+  {% endif %}
+{% endwith %}
+  </div>
   <input type="submit" name="edit"></input>
   <input type="submit" name="cancel" value="cancel"></input> 
   

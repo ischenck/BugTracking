@@ -76,8 +76,8 @@ class BugReportForm(FlaskForm):
         )
     discoveredDate = DateField('Discovered Date', default=date.today
         )
-    areaName = SelectField("Fuctional Area",  validators=[InputRequired()]
-        )
+    
+        
     assignedTo = SelectField('Assigned To', validators=[InputRequired()], coerce=int
         )
     comments = StringField("comments", validators=[DataRequired(), Length(min=1, max=400)]
@@ -127,8 +127,7 @@ class EditForm(FlaskForm):
     userLevel = IntegerField('User Level',
         validators=[NumberRange(1, 4, "User Level must be between 1 and 4")]
     )
-    functionalArea = SelectField('Functional Area', validators=[InputRequired()])
-
+    
 class RegisterForm(FlaskForm):
     name = StringField(
         'Name',
@@ -145,10 +144,15 @@ class RegisterForm(FlaskForm):
     userLevel = IntegerField('User Level',
         validators=[NumberRange(1, 4, "User Level must be between 1 and 4")]
     )
-    functionalArea = SelectField('Functional Area', validators=[InputRequired()])
-
+    
 class addFuncAreaForm(FlaskForm):
+    program = SelectField('Program', validators=[Optional()], coerce=int)
     area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
+    
+class editFuncAreaForm(FlaskForm):
+    program = StringField('Program', validators=[DataRequired(), Length(min=1, max = 40)])
+    area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
+
 
 class addProgramForm(FlaskForm):
     #programID = IntegerField(

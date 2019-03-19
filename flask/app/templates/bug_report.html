@@ -174,21 +174,7 @@
             </td>
         </tr>
         <tr>
-             <td>
-                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Functional Area</span>
-                  </div>
-                {{ form.areaName(placeholder="Functional Area") }}
-                {% if form.areaName.errors %}
-                  <span class="error">
-                    {% for error in form.areaName.errors %}
-                      {{ error }}
-                    {% endfor %}
-                  </span>
-                {% endif %}
-                </div>
-             </td>
+             
             <td>
                 <div class="input-group">
                     <div class="input-group-prepend">

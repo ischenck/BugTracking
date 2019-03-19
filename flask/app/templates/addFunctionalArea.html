@@ -9,8 +9,24 @@
 <div class="form-group">
  <form method="POST" action="/addFunctionalArea" role="form">
   {{ form.csrf_token }}
-     <label for="Functional Area">Functional Area:</label>
-  <div class="input-group">
+  
+  
+  
+<div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Program</span>
+        </div>
+        {{ form.program(placeholder="program") }}
+        {% if form.program.errors %}
+          <span class="error">
+            {% for error in form.program.errors %}
+              {{ error }}
+            {% endfor %}
+          </span>
+        {% endif %}
+</div>
+  <label for="Functional Area">Functional Area:</label>
+<div class="input-group">
     {{ form.area(placeholder="functional Area") }}
     {% if form.area.errors %}
       <span class="error">
@@ -20,9 +36,22 @@
       </span>
     {% endif %}
   </div>
+
   
   <input type="submit" name="edit"></input>
   <input type="submit" name="cancel" value="cancel"></input> 
+    <div>
+  {% with messages = get_flashed_messages(category_filter=["add_function_error"]) %}
+  {% if messages %}
+    
+    {% for message in messages %}
+      <span  class="{{ add_function_error }}" style="color: red;">{{ message }}</span>
+    {% endfor %}
+    
+  {% endif %}
+{% endwith %}
+  </div>
+   
    <!--<button class="btn btn-sm btn-success" type="submit">Add new Functional Area</button>-->
   <br>
 </form>

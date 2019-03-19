@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request, session
 from app import app
 from app.forms import EditForm, RegisterForm, BugReportForm, LoginForm, SearchForm, ExportForm, addFuncAreaForm, addProgramForm
-
+from app.forms import editFuncAreaForm
 from flaskext.mysql import MySQL
 from functools import wraps
 import os, sys, gzip
@@ -15,7 +15,7 @@ mysql = MySQL()
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -92,17 +92,33 @@ def select():
     results = cursor.fetchall()
     return render_template('db.html', results=results)
 
+'''
+Display links to edit a selected Functional Area
+
+
+'''
 @app.route('/selectFunctionalArea')
 def selectFunctionalArea():
+    error=None
+    success=None
     if user_.level == 0:
         return redirect(url_for('login'))
     if user_.level != 2:
          return redirect(url_for('index'))
     cursor = mysql.connect().cursor()
     sql = "select * from FunctionalArea"
-    cursor.execute(sql)
-    results = cursor.fetchall()
-    return render_template('dbFunctionalArea.html', results=results, user = user_)
+    
+    try:
+        cursor.execute(sql)        
+        results = cursor.fetchall()
+        flash('New Function Added.',success)
+        print(results, file=sys.stderr)
+    except Exception as e:
+        print(e, file=sys.stderr)        
+        flash("Invalid entry, please try again.",error)
+        return redirect(url_for('addFunctionalArea'))
+
+    return render_template('dbFunctionalArea.html', results=results, user = user_,error=error)
 
 @app.route('/selectProgram')
 def selectProgram():
@@ -133,25 +149,12 @@ def edit(id):
     results = cursor.fetchone()
     employeeString = results
 
-    sql = "SELECT * FROM FunctionalArea"
-    cursor.execute(sql)
-    functionalAreaResults = list(cursor.fetchall())
-    areas = [i[0] for i in functionalAreaResults]
-
-    # put employee's current functional area on top of list
-    print(areas)
-    areas.insert(0, areas.pop(areas.index(results[5])))
-    # make list of tuples to pass to wtf-form's SelectField (value, display)
-    areas_list=[(i, i) for i in areas]
-
     if request.method == 'GET':      
         form.name.data = results[1]
         form.username.data = results[2]
         form.password.data = ""
         form.userLevel.data = results[4]
-        form.functionalArea.choices = areas_list
     elif request.method == 'POST':
-        form.functionalArea.choices = areas_list
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('select'))
         if form.validate_on_submit():
@@ -160,10 +163,10 @@ def edit(id):
                 str(form.name.data), 
                 str(form.username.data), 
                 str(form.password.data), 
-                str(form.userLevel.data),
-                str(form.functionalArea.data),)
+                str(form.userLevel.data)
+                )
             try:
-                sql = "UPDATE Employee SET name=%s, username=%s, password=%s, level=%s, area=%s WHERE employeeId="+str(id)
+                sql = "UPDATE Employee SET name=%s, username=%s, password=%s, level=%s WHERE employeeId="+str(id)
                 cursor.execute(sql, editedEmployee)
                 con.commit()
                 flash('Employee information updated.')
@@ -181,33 +184,44 @@ def editFunctionalArea(id):
     if user_.level != 2:
          return redirect(url_for('index'))
 
-    form = addFuncAreaForm()
+    edit_function_error = None
+    error = None
+    
+    
+    form = editFuncAreaForm()
     con = mysql.connect()
     cursor = con.cursor()
-    word = "'" + str(id) + "'"
-    
-    sql = "SELECT * FROM FunctionalArea WHERE areaName=" + word
+    sql = "SELECT * FROM FunctionalArea where areaId="+str(id)
     cursor.execute(sql)
-    results = cursor.fetchone()
-    areaString = results
+    areas = cursor.fetchall()
+    print(areas, file=sys.stderr)
+    
+    sql = "SELECT * FROM Program where programId="+str(areas[0][2])
+    cursor.execute(sql)
+    progs = cursor.fetchall()
+    print(progs, file=sys.stderr)
+    
     
     if request.method == 'GET':
-        form.area.data = results[0]
+        form.area.data=areas[0][1]
+        form.program.data=progs[0][1]
+
     elif request.method == 'POST':
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('selectFunctionalArea'))
         if form.validate_on_submit():
             editedArea = (str(form.area.data))
             try:
-                sql = "UPDATE FunctionalArea SET areaName=%s WHERE areaName=" + word
+                sql = "UPDATE FunctionalArea SET areaName=%s WHERE areaId="+str(id)
                 cursor.execute(sql,editedArea)
                 con.commit()
                 return redirect(url_for('selectFunctionalArea'))
             except Exception as e:
-                print("problem" + str(e))
+                
+                flash("Invalid entry, please try again.",edit_function_error)
                 return redirect(url_for('selectFunctionalArea'))
             
-    return render_template('editFunctionalArea.html',results = areaString, form=form)
+    return render_template('editFunctionalArea.html',error = error, edit_function_error = edit_function_error, form=form)
 
 @app.route('/editProgram/<id>', methods = ['Get' , 'Post'])
 def editProgram(id):
@@ -254,6 +268,8 @@ def editProgram(id):
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
+    #insert into Employee values(null, 'John House','john','password', 2);
+
     if user_.level == 0:
          return redirect(url_for('login'))
     if user_.level != 2:
@@ -263,13 +279,9 @@ def register():
     form = RegisterForm(request.form)
     con = mysql.connect()
     cursor = con.cursor()
-    sql = "SELECT * FROM FunctionalArea"
-    cursor.execute(sql)
-    areas = cursor.fetchall()
-    areas_list=[(str(i[0]), str(i[0])) for i in areas]
-    form.functionalArea.choices = areas_list
+
     if request.method == 'POST':
-        form.functionalArea.choices = areas_list
+        
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('register'))
         if form.validate_on_submit():
@@ -278,10 +290,10 @@ def register():
                 str(form.username.data), 
                 str(form.password.data), 
                 str(form.userLevel.data), 
-                str(form.functionalArea.data),
+            
                 )
             try:
-                sql = "INSERT INTO Employee (name, username, password, level, area) VALUES (%s, %s, %s, %s, %s)"
+                sql = "INSERT INTO Employee (name, username, password, level) VALUES (%s, %s, %s, %s)"
                 cursor.execute(sql, newEmployee)
                 
                 con.commit()
@@ -299,27 +311,45 @@ def addFunctionalArea():
         return redirect(url_for('login'))
     if user_.level != 2:
          return redirect(url_for('index'))
+    add_function_error = None
     error = None
     form = addFuncAreaForm(request.form)
     #newArea = (str(form.area.data))
+       
     con = mysql.connect()
     cursor = con.cursor()
+    sql = "SELECT * FROM Program"
+    cursor.execute(sql)
+    programs = cursor.fetchall()
+    programStr = "%s, version: %s, release: %s"
+ 
+    programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
+    form.program.choices = programList
+    
+        
     if request.method == 'POST':
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('addFunctionalArea'))
-        if form.validate_on_submit():
-            newArea = (str(form.area.data))
+        if form.validate_on_submit():  
+            newProgram = (str(form.area.data),
+                          str(form.program.data))
             try:
-                sql = 'INSERT INTO FunctionalArea(areaName) VALUES (%s)'
-                cursor.execute(sql, newArea)
+                sql = 'INSERT INTO FunctionalArea(areaName, programId) VALUES (%s, %s)'
+                res = cursor.execute(sql, newProgram)
                 con.commit()
                 flash('New Function Added.')
                 return redirect(url_for('addFunctionalArea'))
             except Exception as e:
-                flash("Problem inserting into Database: " + str(e))
+                print(e, file=sys.stderr)
+                error = 'Invalid entry, please try again.'
+                
+                flash("Invalid entry, please try again.",add_function_error)
                 return redirect(url_for('addFunctionalArea'))
     
-    return render_template('addFunctionalArea.html', form=form, error=error)
+    return render_template('addFunctionalArea.html', form=form,error=error, add_function_error=add_function_error)
+
+
+
 
 @app.route('/addProgram', methods=['GET', 'POST'])
 def addProgram():
@@ -374,6 +404,7 @@ def search():
 
     programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
     form.program.choices = programList
+    
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
@@ -523,11 +554,11 @@ def bug_report():
 #    form.areaName.choices = funcAreaList
     #end functionalArea
    
-    sql = "SELECT * FROM FunctionalArea"
-    cursor.execute(sql)
-    areas = cursor.fetchall()
-    areas_list=[(str(i[0]), str(i[0])) for i in areas]
-    form.areaName.choices = areas_list
+#    sql = "SELECT * FROM FunctionalArea"
+#    cursor.execute(sql)
+#    areas = cursor.fetchall()
+#    areas_list=[(str(i[0]), str(i[0])) for i in areas]
+#    form.areaName.choices = areas_list
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
@@ -582,16 +613,15 @@ def bug_report():
                 str(form.resolvedDate.data),
                 str(form.testedBy.data),
                 str(form.testedDate.data),
-                str(deferred),
-                str(form.areaName.data)
+                str(deferred)
                 )
             try:
                 sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
                     reproducable, description, suggestedFix, reportedBy, discoveredDate, \
                     assignedTo, comments, status, priority, resolution, \
                     resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, \
-                    deferred,areaName) \
-                    VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    deferred) \
+                    VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                 cursor.execute(sql, bugReportData)
                 con.commit()
