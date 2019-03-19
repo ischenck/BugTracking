@@ -120,6 +120,7 @@ def selectFunctionalArea():
 
     return render_template('dbFunctionalArea.html', results=results, user = user_,error=error)
 
+
 @app.route('/selectProgram')
 def selectProgram():
     if user_.level == 0:
@@ -131,6 +132,7 @@ def selectProgram():
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('dbProgram.html', results = results, user=user_)
+
 
 @app.route('/editBugReport/<id>', methods=['GET', 'POST'])
 def editBugReport(id):
@@ -145,7 +147,6 @@ def editBugReport(id):
     cursor.execute(sql)
     report = cursor.fetchone()
 
-
     sql = "SELECT * FROM Program"
     cursor.execute(sql)
     programs = cursor.fetchall()
@@ -153,7 +154,6 @@ def editBugReport(id):
     programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
     #programList.insert(0, programList.pop(programList.index(report[1])))
     form.program.choices = programList
-
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
@@ -186,6 +186,48 @@ def editBugReport(id):
         form.resolvedDate.data = report[17]
         form.testedDate.data = report[19]
         form.deferred.data = (report[20] == 1)
+
+    elif request.method == 'POST': 
+        if form.validate_on_submit():
+            reproducable = int(str(form.reproducable.data) == 'True')
+            deferred = int(str(form.deferred.data) == 'True')
+            bugReportData = (
+                str(form.program.data),
+                str(form.reportType.data),
+                str(form.severity.data),
+                str(form.summary.data),
+                str(reproducable),
+                str(form.description.data),
+                str(form.suggestedFix.data),
+                str(form.reportedBy.data),
+                str(form.discoveredDate.data),
+                str(form.assignedTo.data),
+                str(form.comments.data),
+                str(form.status.data),
+                str(form.priority.data),
+                str(form.resolution.data),
+                str(form.resolutionVersion.data),
+                str(form.resolvedBy.data),
+                str(form.resolvedDate.data),
+                str(form.testedBy.data),
+                str(form.testedDate.data),
+                str(deferred)
+                )
+            try:
+                sql = "UPDATE BugReport SET programId=%s, reportType=%s, severity=%s, \
+                    summary=%s, reproducable=%s, description=%s, suggestedFix=%s, \
+                    reportedBy=%s, discoveredDate=%s, assignedTo=%s, comments=%s, \
+                    status=%s, priority=%s, resolution=%s, resolutionVersion=%s, \
+                    resolvedBy=%s, resolvedDate=%s, testedBy=%s, testedDate=%s, deferred=%s \
+                    WHERE reportId="+str(report[0]) 
+
+                cursor.execute(sql, bugReportData)
+                con.commit()
+                return redirect(url_for('upload', report=id))
+            except Exception as e:
+                print("Error: " + str(e))
+                return redirect(url_for('editBugReport', id=id))
+                
     return render_template('edit_bug_report.html', form=form, error=error, user=user_)
 
 
@@ -669,8 +711,8 @@ def upload_file():
     return render_template('upload.html')
 
 
-@app.route('/uploader/', methods=['GET', 'POST'])
-def upload():
+@app.route('/uploader/<report>', methods=['GET', 'POST'])
+def upload(report):
     #error = None
     if user_.level == 0:
         return redirect(url_for('login'))
@@ -681,12 +723,12 @@ def upload():
         
         con = mysql.connect()
         cursor = con.cursor() 
-        sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
-        cursor.execute(sql)
-        id = cursor.fetchone()[0] - 1
+        #sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
+        #cursor.execute(sql)
+        #id = cursor.fetchone()[0] - 1
         print(id)    
         newUpload = (
-                    str(id),
+                    str(report),
                     str(f.filename), 
                     read_file(os.path.join('temp_file/',f.filename))
                     )
@@ -698,13 +740,13 @@ def upload():
             con.commit()
             
             print('New attachment added.')
-            return redirect(url_for('bug_report'))
+            return redirect(url_for('upload', report=report))
 
         except Exception as e:
             print("Problem inserting into db: " + str(e))
             os.remove(os.path.join('temp_file/',f.filename))
             con.close()
-            return redirect(url_for('upload'))
+            return redirect(url_for('upload', report=report))
 
         #clean file
         os.remove(os.path.join('temp_file/',f.filename))

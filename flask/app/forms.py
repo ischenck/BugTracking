@@ -96,7 +96,7 @@ class BugReportForm(FlaskForm):
         validators=[InputRequired()], coerce=int
         )
     resolutionVersion = IntegerField("Resolution Version",
-        validators=[NumberRange(1, 4, "Resolution Version must be between 1 and 4")]
+        validators=[NumberRange(1, 1000, "Resolution Version must be between 1 and 1000")]
         )
     resolvedBy = SelectField("Resolved By", validators=[InputRequired()], coerce=int
         )
