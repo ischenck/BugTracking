@@ -151,17 +151,17 @@ def editBugReport(id):
     cursor.execute(sql)
     programs = cursor.fetchall()
     programStr = "%s, version: %s, release: %s"
-    programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
-    #programList.insert(0, programList.pop(programList.index(report[1])))
+    programList = [(i[0], (programStr % i[1:4])) for i in programs]    
     form.program.choices = programList
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
-    employees = ((0,''),) + cursor.fetchall()
+    employees = cursor.fetchall()
+    employeesOptional = ((-1,''),) + employees
     form.reportedBy.choices = employees
-    form.assignedTo.choices = employees
-    form.resolvedBy.choices = employees
-    form.testedBy.choices = employees
+    form.assignedTo.choices = employeesOptional
+    form.resolvedBy.choices = employeesOptional
+    form.testedBy.choices = employeesOptional
 
 
     if request.method == 'GET':
@@ -213,6 +213,10 @@ def editBugReport(id):
                 str(form.testedDate.data),
                 str(deferred)
                 )
+
+            invalid = ('', '-1', 'None')
+            bugReportData = [i if i not in invalid else 'DEFAULT' for i in bugReportData]
+            
             try:
                 sql = "UPDATE BugReport SET programId=%s, reportType=%s, severity=%s, \
                     summary=%s, reproducable=%s, description=%s, suggestedFix=%s, \
@@ -259,7 +263,6 @@ def edit(id):
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('select'))
         if form.validate_on_submit():
-            print('redirect on submit')
             editedEmployee = (
                 str(form.name.data), 
                 str(form.username.data), 
@@ -503,14 +506,13 @@ def search():
     programs = cursor.fetchall()
     programStr = "%s, version: %s, release: %s"
 
-    programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
+    programList = [(-1,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
     form.program.choices = programList
-    print(programList)
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
 
-    employees = ((0,''),) + cursor.fetchall()
+    employees = ((-1,''),) + cursor.fetchall()
 
     form.reportedBy.choices = employees
     form.assignedTo.choices = employees
@@ -522,10 +524,6 @@ def search():
     areas_list= [('',''),] + [(str(i[0]), str(i[0])) for i in areas]
     form.areaName.choices = areas_list
 
-    sql = "SELECT reportId, fileName FROM Attachment"
-    cursor.execute(sql)
-    attachments = cursor.fetchall()
-    print(attachments)
     if request.method == 'POST':
         if form.validate_on_submit():
             allData = {
@@ -541,7 +539,7 @@ def search():
                 "discoveredDate" : str(form.discoveredDate.data),
                 "resolvedBy" : str(form.resolvedBy.data)
             }
-            invalid = ('', '0', 'None')
+            invalid = ('', '-1', 'None')
             searchData = { key:val for key, val in allData.items() if val not in invalid}
             queryParams = ''.join('{} = {} AND '.format(key, val) for key, val in searchData.items())
             sql = "SELECT reportId, programId, summary FROM BugReport" + (" WHERE " if queryParams else '') + queryParams[:-5]
@@ -609,9 +607,11 @@ def bug_report():
     employees = cursor.fetchall()
 
     form.reportedBy.choices = employees
-    form.assignedTo.choices = employees
-    form.resolvedBy.choices = employees
-    form.testedBy.choices = employees
+
+    employeesOptional = ((-1,''),) + employees
+    form.assignedTo.choices = employeesOptional
+    form.resolvedBy.choices = employeesOptional
+    form.testedBy.choices = employeesOptional
 
     #sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
     #cursor.execute(sql)
@@ -636,7 +636,8 @@ def bug_report():
 
             reproducable = int(str(form.reproducable.data) == 'True')
             deferred = int(str(form.deferred.data) == 'True')
-            bugReportData = (
+            bugReportData = [
+                'None',
                 str(form.program.data),
                 str(form.reportType.data),
                 str(form.severity.data),
@@ -657,23 +658,34 @@ def bug_report():
                 str(form.testedBy.data),
                 str(form.testedDate.data),
                 str(deferred)
-                )
-            try:
-                sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
-                    reproducable, description, suggestedFix, reportedBy, discoveredDate, \
-                    assignedTo, comments, status, priority, resolution, \
-                    resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, \
-                    deferred) \
-                    VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                ]
 
-                cursor.execute(sql, bugReportData)
+            invalid = ('', '-1', 'None')
+            bugReportData = ["'" + i + "'" if i not in invalid else 'DEFAULT' for i in bugReportData]
+            
+            reportString = ''.join("{}, ".format(val) for val in bugReportData)
+            reportString = reportString[:-2]
+            try:
+                #sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
+                #    reproducable, description, suggestedFix, reportedBy, discoveredDate, \
+                #    assignedTo, comments, status, priority, resolution, \
+                #    resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, \
+                #    deferred) \
+                #    VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                sql = "INSERT INTO BugReport VALUES (" + reportString + ")"
+                print(sql)
+                cursor.execute(sql)
                 con.commit()
                 #sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
                 #cursor.execute(sql, attachment)
                 #con.commit()
                 print('New Bug Report added')
 
-                return redirect(url_for('upload'))
+                sql = "SELECT max(reportId) FROM BugReport"
+                cursor.execute(sql)
+                reportId = cursor.fetchone()
+
+                return redirect(url_for('upload', report=reportId[0]))
             except Exception as e:
                 print("Problem inserting into db: " + str(e))
                 #os.remove(os.path.join('temp_file/',f.filename))

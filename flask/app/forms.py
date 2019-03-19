@@ -17,12 +17,12 @@ class SearchForm(FlaskForm):
     program = SelectField('Program', validators=[Optional()], coerce=int
         )
 
-    reportType = SelectField("Report Type", choices=[(0,''), (1, "Coding Error"), 
+    reportType = SelectField("Report Type", choices=[(-1,''), (1, "Coding Error"), 
         (2, "Suggestion"), (3, "Documentation"), 
         (4, "Hardware"), (5, "Query")
         ], default='', validators=[Optional()], coerce=int
         )
-    severity = SelectField("Severity", choices=[(0,''), (3, "Minor"), 
+    severity = SelectField("Severity", choices=[(-1,''), (3, "Minor"), 
         (2, "Serious"), 
         (1, "Fatal")], default='', validators=[Optional()], coerce=int
         )
@@ -31,14 +31,14 @@ class SearchForm(FlaskForm):
         )
     assignedTo = SelectField('Assigned To', validators=[Optional()], coerce=int
         )    
-    status = SelectField("Status", choices=[(0,''), (1, "Open"), (2, "Closed")], default='', validators=[Optional()], coerce=int
+    status = SelectField("Status", choices=[(-1,''), (1, "Open"), (2, "Closed")], default='', validators=[Optional()], coerce=int
         )
-    priority = SelectField("Priority", choices=[(0,''), (1, "Fix immediately"), 
+    priority = SelectField("Priority", choices=[(-1,''), (1, "Fix immediately"), 
         (2, "Fix as soon as possible"), (3, "Fix before next milestone"),
         (4, "Fix before release"), (5, "Fix if possible"), 
         (6, "Optional")], default='', validators=[Optional()], coerce=int
         )
-    resolution = SelectField("Resolution", choices=[(0,''), (1, "Pending"), (2, "Fixed"),
+    resolution = SelectField("Resolution", choices=[(-1,''), (1, "Pending"), (2, "Fixed"),
         (3, "Irreproducible"), (4, "Deferred"), (5, "As designed"),
         (6, "Withdrawn by reporter"), (7, "Need more info"),
         (8, "Disagree with suggestion"), (9, "Duplicate")], default='', 
@@ -70,7 +70,7 @@ class BugReportForm(FlaskForm):
         )
     description = TextAreaField("Description", validators=[DataRequired(), Length(min=1, max=400)]
         )
-    suggestedFix = TextAreaField("Description", validators=[DataRequired(), Length(min=1, max=400)]
+    suggestedFix = TextAreaField("Description", validators=[Optional(), Length(min=1, max=400)]
         )
     reportedBy = SelectField('Reported By', validators=[InputRequired()], coerce=int
         )
@@ -78,33 +78,33 @@ class BugReportForm(FlaskForm):
         )
     
         
-    assignedTo = SelectField('Assigned To', validators=[InputRequired()], coerce=int
+    assignedTo = SelectField('Assigned To', validators=[Optional()], coerce=int
         )
-    comments = TextAreaField("comments", validators=[DataRequired(), Length(min=1, max=400)]
+    comments = TextAreaField("comments", validators=[Optional(), Length(min=1, max=400)]
         )
-    status = SelectField("Status", choices=[(1, "Open"), (2, "Closed")], validators=[InputRequired()], coerce=int
+    status = SelectField("Status", choices=[(-1, ''), (1, "Open"), (2, "Closed")], validators=[Optional()], coerce=int
         )
-    priority = SelectField("Priority", choices=[(1, "Fix immediately"), 
+    priority = SelectField("Priority", choices=[(-1, ''), (1, "Fix immediately"), 
         (2, "Fix as soon as possible"), (3, "Fix before next milestone"),
         (4, "Fix before release"), (5, "Fix if possible"), 
-        (6, "Optional")], validators=[InputRequired()], coerce=int
+        (6, "Optional")], validators=[Optional()], coerce=int
         )
-    resolution = SelectField("Resolution", choices=[(1, "Pending"), (2, "Fixed"),
+    resolution = SelectField("Resolution", choices=[(-1, ''),(1, "Pending"), (2, "Fixed"),
         (3, "Irreproducible"), (4, "Deferred"), (5, "As designed"),
         (6, "Withdrawn by reporter"), (7, "Need more info"),
         (8, "Disagree with suggestion"), (9, "Duplicate")],
-        validators=[InputRequired()], coerce=int
+        validators=[Optional()], coerce=int
         )
     resolutionVersion = IntegerField("Resolution Version",
-        validators=[NumberRange(1, 1000, "Resolution Version must be between 1 and 1000")]
+        validators=[Optional(), NumberRange(1, 1000, "Resolution Version must be between 1 and 1000")]
         )
-    resolvedBy = SelectField("Resolved By", validators=[InputRequired()], coerce=int
+    resolvedBy = SelectField("Resolved By", validators=[Optional()], coerce=int
         )
-    resolvedDate = DateField("Resolved Date", default=date.today
+    resolvedDate = DateField("Resolved Date", validators=[Optional()]
         )
-    testedBy = SelectField("Tested By", validators=[InputRequired()], coerce=int
+    testedBy = SelectField("Tested By", validators=[Optional()], coerce=int
         )
-    testedDate = DateField("Tested Date", default=date.today
+    testedDate = DateField("Tested Date", validators=[Optional()]
         )
     deferred = BooleanField("Deferred"
         )

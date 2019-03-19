@@ -14,7 +14,10 @@
         <td>{{ report[1] }}</td>
         <td>{{ report[2] }}</td>
          <td>
-            <a href="{{ url_for('editBugReport', id=report[0]) }}">edit</a>
+            <a href="{{ url_for('editBugReport', id=report[0]) }}">Edit</a>
+        </td>
+        <td>
+            <a href="{{ url_for('upload', report=report[0]) }}">Add Attachment</a>
         </td>
     </tr>
       
