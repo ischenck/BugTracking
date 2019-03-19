@@ -191,41 +191,41 @@ def editBugReport(id):
         if form.validate_on_submit():
             reproducable = int(str(form.reproducable.data) == 'True')
             deferred = int(str(form.deferred.data) == 'True')
-            bugReportData = (
-                str(form.program.data),
-                str(form.reportType.data),
-                str(form.severity.data),
-                str(form.summary.data),
-                str(reproducable),
-                str(form.description.data),
-                str(form.suggestedFix.data),
-                str(form.reportedBy.data),
-                str(form.discoveredDate.data),
-                str(form.assignedTo.data),
-                str(form.comments.data),
-                str(form.status.data),
-                str(form.priority.data),
-                str(form.resolution.data),
-                str(form.resolutionVersion.data),
-                str(form.resolvedBy.data),
-                str(form.resolvedDate.data),
-                str(form.testedBy.data),
-                str(form.testedDate.data),
-                str(deferred)
-                )
+            bugReportData = {
+                "programId": (form.program.data),
+                "reportType": (form.reportType.data),
+                "severity": (form.severity.data),
+                "summary": str("'" + form.summary.data + "'"),
+                "reproducable": (reproducable),
+                "description": str("'" + form.description.data + "'"),
+                "suggestedFix": str("'" + form.suggestedFix.data + "'"),
+                "reportedBy": (form.reportedBy.data),
+                "discoveredDate": str("'" + str(form.discoveredDate.data) + "'"),
+                "assignedTo": (form.assignedTo.data),
+                "comments": str("'" + form.comments.data + "'"),
+                "status": (form.status.data),
+                "priority": (form.priority.data),
+                "resolution": (form.resolution.data),
+                "resolutionVersion": (form.resolutionVersion.data),
+                "resolvedBy": (form.resolvedBy.data),
+                "resolvedDate": str("'" + str(form.resolvedDate.data) + "'"),
+                "testedBy": (form.testedBy.data),
+                "testedDate": str("'" + str(form.testedDate.data) + "'"),
+                "deferred": (deferred)
+                }
 
-            invalid = ('', '-1', 'None')
-            bugReportData = [i if i not in invalid else 'DEFAULT' for i in bugReportData]
-            
+            invalid = ('', '-1', 'None', "''", "'-1'", "'None'")
+            updatedBugReport = { key:val for key, val in bugReportData.items() if val not in invalid}
+            reportParams = ''.join('{} = {}, '.format(key, val) for key, val in updatedBugReport.items())            
             try:
-                sql = "UPDATE BugReport SET programId=%s, reportType=%s, severity=%s, \
-                    summary=%s, reproducable=%s, description=%s, suggestedFix=%s, \
-                    reportedBy=%s, discoveredDate=%s, assignedTo=%s, comments=%s, \
-                    status=%s, priority=%s, resolution=%s, resolutionVersion=%s, \
-                    resolvedBy=%s, resolvedDate=%s, testedBy=%s, testedDate=%s, deferred=%s \
-                    WHERE reportId="+str(report[0]) 
-
-                cursor.execute(sql, bugReportData)
+                #sql = "UPDATE BugReport SET programId=%s, reportType=%s, severity=%s, \
+                #    summary=%s, reproducable=%s, description=%s, suggestedFix=%s, \
+                #    reportedBy=%s, discoveredDate=%s, assignedTo=%s, comments=%s, \
+                #    status=%s, priority=%s, resolution=%s, resolutionVersion=%s, \
+                #    resolvedBy=%s, resolvedDate=%s, testedBy=%s, testedDate=%s, deferred=%s \
+                #    WHERE reportId="+str(report[0]) 
+                sql = "UPDATE BugReport SET " + reportParams[:-2] + " WHERE reportId=" + str(report[0])
+                cursor.execute(sql)
                 con.commit()
                 return redirect(url_for('upload', report=id))
             except Exception as e:
