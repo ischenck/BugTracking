@@ -15,7 +15,7 @@ mysql = MySQL()
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -115,6 +115,113 @@ def selectProgram():
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('dbProgram.html', results = results, user=user_)
+
+@app.route('/editBugReport/<id>', methods=['GET', 'POST']):
+def editBugReport(id):
+    if user_.level ==0:
+        return redirect(url_for('login'))
+
+    form = BugReportForm()
+    con = mysql.connect()
+    cursor = con.cursor()
+
+    sql = "SELECT * FROM BugReport WHERE reportId="+str(id)
+    cursor.execute(sql)
+    report = cursor.fetchone()
+
+
+    sql = "SELECT * FROM Program"
+    cursor.execute(sql)
+    programs = cursor.fetchall()
+    programStr = "%s, version: %s, release: %s"
+    programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
+    programList.insert(0, programList.pop(programList.index(report[1])))
+    form.program.choices = programList
+    
+    sql = "SELECT employeeId, name FROM Employee"
+    cursor.execute(sql)
+    employees = ((0,''),) + cursor.fetchall()
+
+    reportedBy = employees.copy()
+    reportedBy.insert(0, reportedBy.pop(reportedBy.index(report[8])))
+    form.reportedBy.choices = reportedBy
+
+    assignedTo = employees.copy()
+    assignedTo.insert(0, assignedTo.pop(assignedTo.index(report[10])))
+    form.assignedTo.choices = assignedTo
+
+    resolvedBy = employees.copy()
+    resolvedBy.insert(0, resolvedBy.pop(resolvedBy.index(report[16])))
+    form.resolvedBy.choices = resolvedBy
+
+    testedBy = employees.copy()
+    testedBy.insert(0, testedBy.pop(testedBy.index(report[18])))
+    form.testedBy.choices = testedBy
+
+    sql = "SELECT * FROM FunctionalArea"
+    cursor.execute(sql)
+    areas = cursor.fetchall()
+    areas.insert(0, areas.pop(areas.index(report[21])))
+    areas_list= [('',''),] + [(str(i[0]), str(i[0])) for i in areas]
+    form.areaName.choices = areas_list
+
+    reportType = [
+        (0, ''), 
+        (1, "coding Error"), 
+        (2, "Suggestions"), 
+        (3, "Documentation"), 
+        (4, "Hardware"), 
+        (5, "Query")
+    ]
+    reportType.insert(0, reportType.pop(reportType.index(report[2])))
+    form.reportType.choices = reportType
+    severity = [
+        (0, ''),
+        (1, 'Fatal'),
+        (2, 'Serious'),
+        (3, 'Minor')
+    ]
+
+    severity.insert(0, severity.pop(severity.index(report[3])))
+    form.severity.choices = severity
+
+    priority = [
+        (0, '')
+        (1, "Fix immediately") ,
+        (2, "Fix as soon as possible"), 
+        (3, "Fix before next milestone"),
+        (4, "Fix before release"),
+        (5, "Fix if possible"), 
+        (6: "Optional")
+    ]
+    priority.insert(0, priority.pop(priority.index(report[4])))
+    form.priority.choices = priority
+
+    resolution = [
+        (0, ''), 
+        (1, "Pending"),
+        (2, "Fixed"),
+        (3, "Irreproducible"), 
+        (4, "Deferred"), 
+        (5, "As designed"),
+        (6, "Withdrawn by reporter"), 
+        (7, "Need more info"),
+        (8, "Disagree with suggestion"),
+        (9, "Duplicate")
+    ]
+    resolution.insert(0, resolution.pop(resolution.index(report[14])))
+    form.resolution.choices = resolution
+
+    form.summary.data = report[4]
+    form.reproducable.data = ('True' if report[5] == 1 else 'False')
+    form.description.data = report[6]
+    form.suggestedFix.data = report[7]
+    form.discoveredData.data = report[9]
+    form.comments.data = report[11]
+    form
+
+
+
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit(id):
@@ -412,7 +519,7 @@ def search():
             invalid = ('', '0', 'None')
             searchData = { key:val for key, val in allData.items() if val not in invalid}
             queryParams = ''.join('{} = {} AND '.format(key, val) for key, val in searchData.items())
-            sql = "SELECT * FROM BugReport" + (" WHERE " if queryParams else '') + queryParams[:-5]
+            sql = "SELECT reportId, programId, summary FROM BugReport" + (" WHERE " if queryParams else '') + queryParams[:-5]
             
             reportTypeDict = {
                 0: '', 
@@ -456,6 +563,10 @@ def search():
             cursor.execute(sql)
 
             reports = cursor.fetchall()
+
+            session['searchResults'] = reports
+            return render_template('dbBugReport.html')
+
             printableReports = []
             for i in range(len(reports)):
                 printableReports.append({

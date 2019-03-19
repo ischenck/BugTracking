@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %} 
+ 
+
+
+
+<div class="container">
+<table class="table table-bordered">
+{%for report in session.pop('searchResults', ) %}
+      
+    <tr>
+        <td>
+        <a href="{{ url_for('editBugReport', id=row[0]) }}">{{ row[0] }}</a>
+        </td>
+         <td>{{ row[1] }}</td>
+         <td>{{ row[3] }}</td>
+    </tr>
+      
+{% endfor %}
+</table>
+</div>
+
+
+{% endblock %}
+
