@@ -53,19 +53,7 @@
       </span>
     {% endif %}
   </div>
-  <br>
-    <label for="functionalArea">Functional Area:</label>
-  <div class="input-group">
-    {{ form.functionalArea(placeholder="functionalArea") }}
-    {% if form.functionalArea.errors %}
-      <span class="error">
-        {% for error in form.userLevel.errors %}
-          {{ error }}
-        {% endfor %}
-      </span>
-    {% endif %}
-  </div>
-  <br>
+
     
    <input type="submit" name="edit"></input>
   <input type="submit" name="cancel" value="cancel"></input>  
