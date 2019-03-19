@@ -132,11 +132,11 @@ def selectProgram():
     results = cursor.fetchall()
     return render_template('dbProgram.html', results = results, user=user_)
 
-@app.route('/editBugReport/<id>', methods=['GET', 'POST']):
+@app.route('/editBugReport/<id>', methods=['GET', 'POST'])
 def editBugReport(id):
     if user_.level ==0:
         return redirect(url_for('login'))
-
+    error = None
     form = BugReportForm()
     con = mysql.connect()
     cursor = con.cursor()
@@ -151,90 +151,42 @@ def editBugReport(id):
     programs = cursor.fetchall()
     programStr = "%s, version: %s, release: %s"
     programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
-    programList.insert(0, programList.pop(programList.index(report[1])))
+    #programList.insert(0, programList.pop(programList.index(report[1])))
     form.program.choices = programList
+
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
     employees = ((0,''),) + cursor.fetchall()
+    form.reportedBy.choices = employees
+    form.assignedTo.choices = employees
+    form.resolvedBy.choices = employees
+    form.testedBy.choices = employees
 
-    reportedBy = employees.copy()
-    reportedBy.insert(0, reportedBy.pop(reportedBy.index(report[8])))
-    form.reportedBy.choices = reportedBy
 
-    assignedTo = employees.copy()
-    assignedTo.insert(0, assignedTo.pop(assignedTo.index(report[10])))
-    form.assignedTo.choices = assignedTo
+    if request.method == 'GET':
+        form.program.data = report[1]
+        form.reportType.data = report[2]
+        form.severity.data = report[3]
+        form.reportedBy.data = report[8]
+        form.assignedTo.data = report[10]
+        form.status.data = report[12]
+        form.priority.data = report[13]
+        form.resolution.data = report[14]
+        form.resolvedBy.data = report[16]
+        form.testedBy.data = report[18]
 
-    resolvedBy = employees.copy()
-    resolvedBy.insert(0, resolvedBy.pop(resolvedBy.index(report[16])))
-    form.resolvedBy.choices = resolvedBy
-
-    testedBy = employees.copy()
-    testedBy.insert(0, testedBy.pop(testedBy.index(report[18])))
-    form.testedBy.choices = testedBy
-
-    sql = "SELECT * FROM FunctionalArea"
-    cursor.execute(sql)
-    areas = cursor.fetchall()
-    areas.insert(0, areas.pop(areas.index(report[21])))
-    areas_list= [('',''),] + [(str(i[0]), str(i[0])) for i in areas]
-    form.areaName.choices = areas_list
-
-    reportType = [
-        (0, ''), 
-        (1, "coding Error"), 
-        (2, "Suggestions"), 
-        (3, "Documentation"), 
-        (4, "Hardware"), 
-        (5, "Query")
-    ]
-    reportType.insert(0, reportType.pop(reportType.index(report[2])))
-    form.reportType.choices = reportType
-    severity = [
-        (0, ''),
-        (1, 'Fatal'),
-        (2, 'Serious'),
-        (3, 'Minor')
-    ]
-
-    severity.insert(0, severity.pop(severity.index(report[3])))
-    form.severity.choices = severity
-
-    priority = [
-        (0, '')
-        (1, "Fix immediately") ,
-        (2, "Fix as soon as possible"), 
-        (3, "Fix before next milestone"),
-        (4, "Fix before release"),
-        (5, "Fix if possible"), 
-        (6: "Optional")
-    ]
-    priority.insert(0, priority.pop(priority.index(report[4])))
-    form.priority.choices = priority
-
-    resolution = [
-        (0, ''), 
-        (1, "Pending"),
-        (2, "Fixed"),
-        (3, "Irreproducible"), 
-        (4, "Deferred"), 
-        (5, "As designed"),
-        (6, "Withdrawn by reporter"), 
-        (7, "Need more info"),
-        (8, "Disagree with suggestion"),
-        (9, "Duplicate")
-    ]
-    resolution.insert(0, resolution.pop(resolution.index(report[14])))
-    form.resolution.choices = resolution
-
-    form.summary.data = report[4]
-    form.reproducable.data = ('True' if report[5] == 1 else 'False')
-    form.description.data = report[6]
-    form.suggestedFix.data = report[7]
-    form.discoveredData.data = report[9]
-    form.comments.data = report[11]
-    form
+        form.summary.data = report[4]
+        form.reproducable.data = (report[5] == 1)
+        form.description.data = report[6]
+        form.suggestedFix.data = report[7]
+        form.discoveredDate.data = report[9]
+        form.comments.data = report[11]
+        form.resolutionVersion.data = report[15]
+        form.resolvedDate.data = report[17]
+        form.testedDate.data = report[19]
+        form.deferred.data = (report[20] == 1)
+    return render_template('edit_bug_report.html', form=form, error=error, user=user_)
 
 
 
@@ -511,7 +463,7 @@ def search():
 
     programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
     form.program.choices = programList
-    
+    print(programList)
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
@@ -538,7 +490,7 @@ def search():
                 "programId" : str(form.program.data),
                 "reportType" : str(form.reportType.data),
                 "severity" : str(form.severity.data),
-                "areaName" : str(form.areaName.data),
+                #"areaName" : str(form.areaName.data),
                 "assignedTo" : str(form.assignedTo.data),
                 "status" : str(form.status.data),
                 "priority" : str(form.priority.data),
@@ -551,86 +503,24 @@ def search():
             searchData = { key:val for key, val in allData.items() if val not in invalid}
             queryParams = ''.join('{} = {} AND '.format(key, val) for key, val in searchData.items())
             sql = "SELECT reportId, programId, summary FROM BugReport" + (" WHERE " if queryParams else '') + queryParams[:-5]
-            
-            reportTypeDict = {
-                0: '', 
-                1: "Coding Error",
-                2: "Suggestions",
-                3: "Documentation",
-                4: "Hardware",
-                5: "Query" 
-            }
-            severityDict = {
-                0: '',
-                1: 'Fatal',
-                2: 'Serious',
-                3: 'Minor'
-            }
-            priorityDict = {
-                0: '',
-                1: "Fix immediately", 
-                2: "Fix as soon as possible", 
-                3: "Fix before next milestone",
-                4: "Fix before release", 
-                5: "Fix if possible)", 
-                6: "Optional"
-            }
-            resolutionDict = {
-                0: '', 
-                1: "Pending",
-                2: "Fixed",
-                3: "Irreproducible", 
-                4: "Deferred", 
-                5: "As designed",
-                6: "Withdrawn by reporter", 
-                7: "Need more info",
-                8: "Disagree with suggestion",
-                9: "Duplicate"
-            }
-            programDict = dict(programList)
-            employeesDict = dict(employees)
-            attachmentsDict = dict(attachments)
+
 
             cursor.execute(sql)
-
+            programDict = dict(programList)
             reports = cursor.fetchall()
 
-            session['searchResults'] = reports
-            return render_template('dbBugReport.html')
+            if not reports:
+                flash("No bug reports match your search")
+                print("no bug reports match your search")
+            else:
+                changedReports = []
+                for result in reports:
+                    changedResult = list(result)
+                    changedResult[1] = programDict.get(result[1])
+                    changedReports.append(changedResult)
 
-            printableReports = []
-            for i in range(len(reports)):
-                printableReports.append({
-                    "Program": programDict.get(reports[i][1]),
-                    "Report Type": reportTypeDict.get(reports[i][2]),
-                    "Severity": severityDict.get(reports[i][3]),
-                    "Summary": reports[i][4],
-                    "Reproducable": "Yes" if reports[i][5] == 1 else "No",
-                    "Description": reports[i][6],
-                    "Suggested Fix": reports[i][7],
-                    "Reported By": employeesDict.get(reports[i][8]),
-                    "Discovered Date": reports[i][9],
-                    "Assigned To": employeesDict.get(reports[i][10]),
-                    "Comments": reports[i][11],
-                    "Status": "Open" if reports[i][12] == 1 else "Closed",
-                    "Priority": priorityDict.get(reports[i][13]),
-                    "Resolution": resolutionDict.get(reports[i][14]),
-                    "Resolution Version": reports[i][15],
-                    "Resolved By": employeesDict.get(reports[i][16]),
-                    "Resolved Date": reports[i][17],
-                    "Tested By": employeesDict.get(reports[i][18]),
-                    "Test Date": reports[i][19],
-                    "Deferred": "Yes" if reports[i][20] == 1 else "No",
-                    "Functional Area": reports[i][21],
-                    "Attachment": attachmentsDict.get(reports[i][0], 'None')
-                })
-
-            reportsResult = []
-            for i in range(len(printableReports)):
-                reportsResult.append(''.join("{}: {} \n".format(key, val) for key, val in printableReports[i].items()))
-
-            session['reports'] = reportsResult
-            return render_template(('results.html'))
+                session['searchResults'] = changedReports
+                return render_template('dbBugReport.html')
 
     return render_template('search.html', form=form, error=error, user=user_)
 

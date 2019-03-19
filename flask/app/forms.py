@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, PasswordField, BooleanField, SubmitField, IntegerField, SelectField
+from wtforms import StringField, TextAreaField, DateField, PasswordField, BooleanField, SubmitField, IntegerField, SelectField
 from wtforms.validators import DataRequired, EqualTo, NumberRange, Length, InputRequired, Optional
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from datetime import date
@@ -64,13 +64,13 @@ class BugReportForm(FlaskForm):
         (2, "Serious"), 
         (1, "Fatal")], validators=[InputRequired()], coerce=int
         )
-    summary = StringField("Summary", validators=[DataRequired(), Length(min=1, max=400)]
+    summary = TextAreaField("Summary", validators=[DataRequired(), Length(min=1, max=400)]
         )
     reproducable = BooleanField("Reproducable"
         )
-    description = StringField("Description", validators=[DataRequired(), Length(min=1, max=400)]
+    description = TextAreaField("Description", validators=[DataRequired(), Length(min=1, max=400)]
         )
-    suggestedFix = StringField("Description", validators=[DataRequired(), Length(min=1, max=400)]
+    suggestedFix = TextAreaField("Description", validators=[DataRequired(), Length(min=1, max=400)]
         )
     reportedBy = SelectField('Reported By', validators=[InputRequired()], coerce=int
         )
@@ -80,7 +80,7 @@ class BugReportForm(FlaskForm):
         
     assignedTo = SelectField('Assigned To', validators=[InputRequired()], coerce=int
         )
-    comments = StringField("comments", validators=[DataRequired(), Length(min=1, max=400)]
+    comments = TextAreaField("comments", validators=[DataRequired(), Length(min=1, max=400)]
         )
     status = SelectField("Status", choices=[(1, "Open"), (2, "Closed")], validators=[InputRequired()], coerce=int
         )
