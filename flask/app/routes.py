@@ -218,16 +218,10 @@ def editBugReport(id):
             updatedBugReport = { key:val for key, val in bugReportData.items() if val not in invalid}
             reportParams = ''.join('{} = {}, '.format(key, val) for key, val in updatedBugReport.items())            
             try:
-                #sql = "UPDATE BugReport SET programId=%s, reportType=%s, severity=%s, \
-                #    summary=%s, reproducable=%s, description=%s, suggestedFix=%s, \
-                #    reportedBy=%s, discoveredDate=%s, assignedTo=%s, comments=%s, \
-                #    status=%s, priority=%s, resolution=%s, resolutionVersion=%s, \
-                #    resolvedBy=%s, resolvedDate=%s, testedBy=%s, testedDate=%s, deferred=%s \
-                #    WHERE reportId="+str(report[0]) 
                 sql = "UPDATE BugReport SET " + reportParams[:-2] + " WHERE reportId=" + str(report[0])
                 cursor.execute(sql)
                 con.commit()
-                return redirect(url_for('upload', report=id))
+                return redirect(url_for('search'))
             except Exception as e:
                 print("Error: " + str(e))
                 return redirect(url_for('editBugReport', id=id))
@@ -681,11 +675,7 @@ def bug_report():
                 #con.commit()
                 print('New Bug Report added')
 
-                sql = "SELECT max(reportId) FROM BugReport"
-                cursor.execute(sql)
-                reportId = cursor.fetchone()
-
-                return redirect(url_for('upload', report=reportId[0]))
+                return redirect(url_for('search'))
             except Exception as e:
                 print("Problem inserting into db: " + str(e))
                 #os.remove(os.path.join('temp_file/',f.filename))
@@ -735,9 +725,7 @@ def upload(report):
         
         con = mysql.connect()
         cursor = con.cursor() 
-        #sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
-        #cursor.execute(sql)
-        #id = cursor.fetchone()[0] - 1
+
         print(id)    
         newUpload = (
                     str(report),
