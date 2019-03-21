@@ -53,7 +53,6 @@ def login():
                 cursor.execute(sql, validate)
                 result = cursor.fetchall()
                 
-                print(len(result), file=sys.stderr)
                 if len(result) == 1:
                     user_.username=result[0][2]
                     user_.level = result[0][4]
@@ -94,7 +93,6 @@ def select():
 @app.route('/selectFunctionalArea')
 def selectFunctionalArea():
     error=None
-    success=None
     if user_.level == 0:
         return redirect(url_for('login'))
     if user_.level != 2:
@@ -165,7 +163,6 @@ def editBugReport(id):
     form.resolvedBy.choices = employeesOptional
     form.testedBy.choices = employeesOptional
 
-
     if request.method == 'GET':
         form.program.data = report[1]
         form.reportType.data = report[2]
@@ -222,6 +219,7 @@ def editBugReport(id):
                 sql = "UPDATE BugReport SET " + reportParams[:-2] + " WHERE reportId=" + str(report[0])
                 cursor.execute(sql)
                 con.commit()
+                flash(f"Bug Report #{report[0]} Updated")
                 return redirect(url_for('search'))
             except Exception as e:
                 flash("Error: " + str(e))
@@ -357,9 +355,10 @@ def editProgram(id):
                 sql = "UPDATE Program SET name=%s, version=%s, releaseNumber=%s, description=%s where programID=" +str(id)
                 cursor.execute(sql, editedProgram)
                 con.commit()
+                flash("Program Edited.")
                 return redirect(url_for('selectProgram'))
             except Exception as e:
-                print("problem" + str(e))
+                flash("problem" + str(e))
                 return redirect(url_for('selectProgram'))
     
     return render_template('editProgram.html', results = programIDString, form = form)
@@ -392,8 +391,8 @@ def register():
                 cursor.execute(sql, newEmployee)
                 
                 con.commit()
-                flash('New employee added.')
-                return redirect(url_for('select'))
+                flash('New Employee Added.')
+                return redirect(url_for('register'))
             except Exception as e:
                 flash("Problem inserting into db: " + str(e))
                 return redirect(url_for('register'))
@@ -470,6 +469,7 @@ def addProgram():
                 sql = 'INSERT INTO Program(name, version, releaseNumber, description) VALUES(%s, %s, %s, %s)'
                 cursor.execute(sql,newProgram)
                 con.commit()
+                flash("New Program Added")
                 return redirect(url_for('addProgram'))
             except Exception as e:
                 flash("problem inserting into Database: " + str(e))
@@ -609,18 +609,16 @@ def bug_report():
             reportString = reportString[:-2]
             try:
                 sql = "INSERT INTO BugReport VALUES (" + reportString + ")"
-                print(sql)
                 cursor.execute(sql)
                 con.commit()
 
-                print('New Bug Report added')
+                flash('New Bug Report added')
 
-                return redirect(url_for('search'))
-            except Exception as e:
-                print("Problem inserting into db: " + str(e))
                 return redirect(url_for('bug_report'))
-        else:
-            print("bad!")
+            except Exception as e:
+                flash("Problem inserting into db: " + str(e))
+                return redirect(url_for('bug_report'))
+
     return render_template('bug_report.html', form=form, error=error, user=user_)
 
 
@@ -645,7 +643,6 @@ def upload(report):
         con = mysql.connect()
         cursor = con.cursor() 
 
-        print(id)    
         newUpload = (
                     str(report),
                     str(f.filename), 
@@ -658,11 +655,11 @@ def upload(report):
             cursor.execute(sql, newUpload)
             con.commit()
             
-            print('New attachment added.')
+            flash(f'New attachment added to Bug Report #{report}.')
             return redirect(url_for('upload', report=report))
 
         except Exception as e:
-            print("Problem inserting into db: " + str(e))
+            flash("Problem inserting into db: " + str(e))
             os.remove(os.path.join('temp_file/',f.filename))
             con.close()
             return redirect(url_for('upload', report=report))
@@ -672,7 +669,6 @@ def upload(report):
         con.close()  
         return redirect(url_for('index'))          
   
-    else: flash('nothing')
     return render_template('upload.html', user=user_)
 
 
@@ -793,9 +789,11 @@ def export():
             attachmentTable = cursor.fetchall()
             tables.append(attachmentTable)
 
-
-        tablesJSON = jsonify(tables)
-        tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
-        return tablesJSON
+        if not tables:
+            flash("No tables selected")
+        else:
+            tablesJSON = jsonify(tables)
+            tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+            return tablesJSON
 
     return render_template('export.html', form=form, error=error, user=user_)
