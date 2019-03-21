@@ -6,7 +6,16 @@
 
 
 <div class="container">
+        <h3>Choose a Program to Edit</h3>
+
 <table class="table table-bordered">
+<tr>
+        <td><b>ID</b></td>
+        <td><b>Name</b></td>
+        <td><b>Version</b></td>
+        <td><b>Release Number</b></td>
+        <td></td>
+    </tr>
 {% for row in results %}
       
     <tr>
@@ -14,7 +23,6 @@
          <td>{{ row[1] }}</td>
          <td>{{ row[2] }}</td>
          <td>{{ row[3] }}</td>
-         <td>{{ row[4] }}</td>
          <td>       
          <a href="{{ url_for('editProgram', id=row[0]) }}">Edit</a>
          </td>

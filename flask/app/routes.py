@@ -101,16 +101,26 @@ def selectFunctionalArea():
          return redirect(url_for('index'))
     cursor = mysql.connect().cursor()
     sql = "select * from FunctionalArea"
-    
+
     try:
         cursor.execute(sql)        
         results = cursor.fetchall()
     except Exception as e:
         print(e, file=sys.stderr)        
         flash("Cannot retrieve any functional areas.",error)
-        return redirect(url_for('addFunctionalArea'))
+        return redirect(url_for('index'))
 
-    return render_template('dbFunctionalArea.html', results=results, user = user_, error=error)
+    sql = "SELECT * FROM Program"
+    cursor.execute(sql)
+    programs = cursor.fetchall()
+    programStr = "%s, version: %s, release: %s"
+    programList = [(i[0], (programStr % i[1:4])) for i in programs]  
+    programDict = dict(programList)
+    functionalAreas = [list(x) for x in results]
+    for area in functionalAreas:
+        area[2] =  programDict.get(area[2])
+
+    return render_template('dbFunctionalArea.html', results=functionalAreas, user = user_, error=error)
 
 
 @app.route('/selectProgram')
@@ -522,7 +532,6 @@ def search():
 
             if not reports:
                 flash("No bug reports match your search", 'warning')
-                print("no bug reports match your search")
             else:
                 changedReports = []
                 for result in reports:

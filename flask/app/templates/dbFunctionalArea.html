@@ -3,11 +3,22 @@
 {% block content %}
 
 <div class="container">
+        <h3>Choose a Functional Area to Edit</h3>
+
 <table class = "table table-bordered">
+    <tr>
+        <td><b>ID</b></td>
+        <td><b> Functional Area</b></td>
+        <td><b>Program</b></td>
+        <td></td>
+    </tr>
 {% for row in results %}
 
     <tr>
         <td>{{row[0]}}</td>
+        <td>{{row[1]}}</td>
+        <td>{{row[2]}}</td>
+
         <td>
         <a href="{{ url_for('editFunctionalArea', id=row[0])}}">Edit</a>
         </td>
