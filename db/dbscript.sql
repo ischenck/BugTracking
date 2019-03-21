@@ -74,29 +74,9 @@ create table Attachment(
 );
 
 
-insert into Employee values(null,'Tony Martinez', 'tony','password', 1);
-insert into Employee values(null, 'Archer Mill','archer','password', 2);
-insert into Employee values(null,'Jessica Martinez', 'jess','password', 1);
-insert into Employee values(null, 'John House','john','password', 2);
+insert into Employee values(null,'pip', 'pip','1111', 2);
+insert into Employee values(null, 'brutus','brutus','1111', 1);
 
-
-insert into Program values(null,'Space Fighter', '1','1','Galactic Fighter');
-insert into Program values(null,'Street Fighter', '1','1','2d console fighter');
-
-insert into FunctionalArea values(null,'User Interface',1);
-insert into FunctionalArea values(null,'Back-end',1);
-insert into FunctionalArea values(null,'Software',1);
-
-insert into BugReport values(null,1,1,1,"summary",true,"test dat","fix nothing",1,'1990-1-1',2,"no comments",1,1,1,111,2,'1990-1-1',1,'1990-1-1',false);
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
 

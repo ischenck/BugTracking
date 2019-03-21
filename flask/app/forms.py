@@ -56,8 +56,9 @@ class BugReportForm(FlaskForm):
         )
 
     reportType = SelectField("Report Type", choices=[(1, "Coding Error"), 
-        (2, "Suggestion"), (3, "Documentation"), 
-        (4, "Hardware"), (5, "Query")
+        (2, "Design Issue"),
+        (3, "Suggestion"), (4, "Documentation"), 
+        (5, "Hardware"), (6, "Query")
         ], validators=[InputRequired()], coerce=int
         )
     severity = SelectField("Severity", choices=[(3, "Minor"), 

@@ -193,28 +193,28 @@ def editBugReport(id):
                 "programId": (form.program.data),
                 "reportType": (form.reportType.data),
                 "severity": (form.severity.data),
-                "summary": str("'" + form.summary.data + "'"),
+                "summary": str('"' + form.summary.data + '"'),
                 "reproducable": (reproducable),
-                "description": str("'" + form.description.data + "'"),
-                "suggestedFix": str("'" + form.suggestedFix.data + "'"),
+                "description": str('"' + form.description.data + '"'),
+                "suggestedFix": str('"' + form.suggestedFix.data + '"'),
                 "reportedBy": (form.reportedBy.data),
-                "discoveredDate": str("'" + str(form.discoveredDate.data) + "'"),
+                "discoveredDate": str('"' + str(form.discoveredDate.data) + '"'),
                 "assignedTo": (form.assignedTo.data),
-                "comments": str("'" + form.comments.data + "'"),
+                "comments": str('"' + form.comments.data + '"'),
                 "status": (form.status.data),
                 "priority": (form.priority.data),
                 "resolution": (form.resolution.data),
                 "resolutionVersion": (form.resolutionVersion.data),
                 "resolvedBy": (form.resolvedBy.data),
-                "resolvedDate": str("'" + str(form.resolvedDate.data) + "'"),
+                "resolvedDate": str('"' + str(form.resolvedDate.data) + '"'),
                 "testedBy": (form.testedBy.data),
-                "testedDate": str("'" + str(form.testedDate.data) + "'"),
+                "testedDate": str('"' + str(form.testedDate.data) + '"'),
                 "deferred": (deferred)
                 }
 
-            invalid = ('', '-1', 'None', "''", "'-1'", "'None'")
+            invalid = (-1, None, '', "", '""', "''",  '-1', '"None"', 'None', "''", "'-1'", "'None'")
             updatedBugReport = { key:val for key, val in bugReportData.items() if val not in invalid}
-            reportParams = ''.join('{} = {}, '.format(key, val) for key, val in updatedBugReport.items())            
+            reportParams = "".join('{} = {}, '.format(key, val) for key, val in updatedBugReport.items())            
             try:
                 sql = "UPDATE BugReport SET " + reportParams[:-2] + " WHERE reportId=" + str(report[0])
                 cursor.execute(sql)
@@ -603,7 +603,7 @@ def bug_report():
                 ]
 
             invalid = ('', '-1', 'None')
-            bugReportData = ["'" + i + "'" if i not in invalid else 'DEFAULT' for i in bugReportData]
+            bugReportData = ['"' + i + '"' if i not in invalid else 'DEFAULT' for i in bugReportData]
             
             reportString = ''.join("{}, ".format(val) for val in bugReportData)
             reportString = reportString[:-2]

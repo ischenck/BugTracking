@@ -68,20 +68,19 @@
         </tr>
         <tr>
             <td colspan="2">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Summary</span>
-                    </div>
-                    <textarea class="form-control" id="summary" name="summary" 
-                        placeholder="Summary" aria-label="With textarea"></textarea>
-                    {% if form.summary.errors %}
-                        <span class="error">
-                        {% for error in form.summary.errors %}
-                            {{ error }}
-                        {% endfor %}
-                        </span>
-                    {% endif %}
+              <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Summary</span>
                 </div>
+                {{ form.summary(placeholder="summary") }}
+                {% if form.summary.errors %}
+                  <span class="error">
+                    {% for error in form.summary.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </span>
+                {% endif %}
+              </div>
             </td>
             <td>
                 <div class="input-group">
@@ -102,41 +101,38 @@
         </tr>
         <tr>
             <td colspan="3">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Description</span>
-                    </div>
-                    <textarea class="form-control" id="description" name="description" 
-                         placeholder="Description" aria-label="With textarea"></textarea>
-                    
-                        {% if form.description.errors %}
-                        <span class="error">
-                            {% for error in form.description.errors %}
-                              {{ error }}
-                            {% endfor %}
-                        </span>
-                        {% endif %}
+              <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Description</span>
                 </div>
+              
+              {{ form.description(placeholder="description") }}
+              {% if form.description.errors %}
+                  <span class="error">
+                  {% for error in form.description.errors %}
+                      {{ error }}
+                  {% endfor %}
+                  </span>
+              {% endif %}
+          </div>
             </td>
         </tr>
         <tr>
             <td colspan="3">
-                  
               <div class="input-group">
-                  <div class="input-group-prepend">
-                        <span class="input-group-text">Suggested Fix - Optional</span>
-                  </div>
-                  <textarea class="form-control" id="suggestedFix" name="suggestedFix" 
-                         placeholder="Suggested Fix" aria-label="With textarea"></textarea>
-                    
-                  {% if form.suggestedFix.errors %}
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Suggested Fix - Optional</span>
+                </div>
+              
+              {{ form.suggestedFix(placeholder="suggestedFix") }}
+              {% if form.suggestedFix.errors %}
                   <span class="error">
-                    {% for error in form.suggestedFix.errors %}
+                  {% for error in form.suggestedFix.errors %}
                       {{ error }}
-                    {% endfor %}
+                  {% endfor %}
                   </span>
-                {% endif %}
-              </div>
+              {% endif %}
+          </div>
             </td>
         </tr>
         <tr>
@@ -195,21 +191,18 @@
         </tr>
         <tr>
             <td colspan="3">
-                <div class="input-group">
-                      <div class="input-group-prepend">
-                            <span class="input-group-text">Comments - Optional</span>
-                      </div>
-                    <textarea class="form-control" id="comments" name="comments" 
-                         placeholder="Comments" aria-label="With textarea"></textarea>
-                   
-                    {% if form.comments.errors %}
-                    <span class="error">
-                        {% for error in form.comments.errors %}
-                          {{ error }}
-                        {% endfor %}
-                    </span>
-                    {% endif %}
-                  </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                      <span class="input-group-text">Comments - Optional</span>
+                </div>
+                  {{ form.comments(placeholder="comments") }}
+                  {% if form.comments.errors %}
+                  <span class="error">
+                      {% for error in form.comments.errors %}
+                        {{ error }}
+                      {% endfor %}
+                  </span>
+                  {% endif %}
             </td>
         </tr>
         <tr>
