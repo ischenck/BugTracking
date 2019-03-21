@@ -6,7 +6,10 @@
 
 
 <div class="container">
+        <h3>Bug Report Search Results {{id}}</h3>
+
 <table class="table table-bordered">
+
 {%for report in session.pop('searchResults', ) %}
       
     <tr>

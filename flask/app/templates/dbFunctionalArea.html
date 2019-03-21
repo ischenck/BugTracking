@@ -7,8 +7,9 @@
 {% for row in results %}
 
     <tr>
+        <td>{{row[0]}}</td>
         <td>
-        <a href="{{ url_for('editFunctionalArea', id=row[0])}}">{{row[0]}}</a>
+        <a href="{{ url_for('editFunctionalArea', id=row[0])}}">Edit</a>
         </td>
     </tr>
     

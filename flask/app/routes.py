@@ -8,8 +8,6 @@ import os, sys, gzip
 import base64
 from app.user_object import User
 import json
-
-#from utils import *
 mysql = MySQL()
 
 
@@ -70,13 +68,13 @@ def login():
                 return redirect(url_for('register'))
     return render_template('login.html', error=error, form=form)
 
-
     
 @app.route('/logout')
 def logout():
     user_.username='fake'
     user_.level=0
     return redirect(url_for('login'))
+
 
 @app.route('/select')
 def select():
@@ -85,18 +83,14 @@ def select():
     if user_.level != 2:
          return redirect(url_for('index'))
     
-#    conn = mysql.connect()
     cursor = mysql.connect().cursor()
     sql = "select * from Employee"
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('db.html', results=results)
 
-'''
-Display links to edit a selected Functional Area
 
-
-'''
+#Display links to edit a selected Functional Area
 @app.route('/selectFunctionalArea')
 def selectFunctionalArea():
     error=None
@@ -111,14 +105,12 @@ def selectFunctionalArea():
     try:
         cursor.execute(sql)        
         results = cursor.fetchall()
-        flash('New Function Added.',success)
-        print(results, file=sys.stderr)
     except Exception as e:
         print(e, file=sys.stderr)        
-        flash("Invalid entry, please try again.",error)
+        flash("Cannot retrieve any functional areas.",error)
         return redirect(url_for('addFunctionalArea'))
 
-    return render_template('dbFunctionalArea.html', results=results, user = user_,error=error)
+    return render_template('dbFunctionalArea.html', results=results, user = user_, error=error)
 
 
 @app.route('/selectProgram')
@@ -175,7 +167,6 @@ def editBugReport(id):
         form.resolution.data = report[14]
         form.resolvedBy.data = report[16]
         form.testedBy.data = report[18]
-
         form.summary.data = report[4]
         form.reproducable.data = (report[5] == 1)
         form.description.data = report[6]
@@ -223,12 +214,10 @@ def editBugReport(id):
                 con.commit()
                 return redirect(url_for('search'))
             except Exception as e:
-                print("Error: " + str(e))
+                flash("Error: " + str(e))
                 return redirect(url_for('editBugReport', id=id))
                 
-    return render_template('edit_bug_report.html', form=form, error=error, user=user_)
-
-
+    return render_template('edit_bug_report.html', form=form, error=error, user=user_, id=id)
 
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
@@ -237,8 +226,7 @@ def edit(id):
         return redirect(url_for('login'))
     if user_.level != 2:
          return redirect(url_for('index'))
-    
-    
+ 
     form = EditForm()
     con = mysql.connect()
     cursor = con.cursor()
@@ -275,6 +263,7 @@ def edit(id):
     
     return render_template('edit.html', results=employeeString, form=form)
 
+
 @app.route('/editFunctionalArea/<id>', methods =['GET' , 'POST'])
 def editFunctionalArea(id):
     if user_.level == 0:
@@ -282,44 +271,47 @@ def editFunctionalArea(id):
     if user_.level != 2:
          return redirect(url_for('index'))
 
-    edit_function_error = None
     error = None
-    
     
     form = editFuncAreaForm()
     con = mysql.connect()
     cursor = con.cursor()
     sql = "SELECT * FROM FunctionalArea where areaId="+str(id)
     cursor.execute(sql)
-    areas = cursor.fetchall()
-    print(areas, file=sys.stderr)
-    
-    sql = "SELECT * FROM Program where programId="+str(areas[0][2])
+    functionalArea = cursor.fetchone()
+
+    sql = "SELECT * FROM Program"
     cursor.execute(sql)
-    progs = cursor.fetchall()
-    print(progs, file=sys.stderr)
-    
-    
+    programs = cursor.fetchall()
+    programStr = "%s, version: %s, release: %s"
+    programList = [(i[0], (programStr % i[1:4])) for i in programs]    
+    form.program.choices = programList
+
     if request.method == 'GET':
-        form.area.data=areas[0][1]
-        form.program.data=progs[0][1]
+        form.area.data=functionalArea[1]
+        form.program.data=functionalArea[2]
 
     elif request.method == 'POST':
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('selectFunctionalArea'))
         if form.validate_on_submit():
-            editedArea = (str(form.area.data))
+            functionalAreaData = {
+                "areaName": str("'" + form.area.data + "'"),
+                "programId": form.program.data
+            }
+            areaParams = ''.join('{} = {}, '.format(key, val) for key, val in functionalAreaData.items())  
             try:
-                sql = "UPDATE FunctionalArea SET areaName=%s WHERE areaId="+str(id)
-                cursor.execute(sql,editedArea)
+                sql = "UPDATE FunctionalArea SET " + areaParams[:-2] + " WHERE areaId="+str(id)
+                cursor.execute(sql)
                 con.commit()
+                flash("Functional Area edited")
                 return redirect(url_for('selectFunctionalArea'))
             except Exception as e:
-                
-                flash("Invalid entry, please try again.",edit_function_error)
+                flash("Invalid entry, please try again.", e)
                 return redirect(url_for('selectFunctionalArea'))
             
-    return render_template('editFunctionalArea.html',error = error, edit_function_error = edit_function_error, form=form)
+    return render_template('editFunctionalArea.html',error = error, form=form)
+
 
 @app.route('/editProgram/<id>', methods = ['Get' , 'Post'])
 def editProgram(id):
@@ -362,12 +354,9 @@ def editProgram(id):
     
     return render_template('editProgram.html', results = programIDString, form = form)
     
-    
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
-    #insert into Employee values(null, 'John House','john','password', 2);
-
     if user_.level == 0:
          return redirect(url_for('login'))
     if user_.level != 2:
@@ -378,8 +367,7 @@ def register():
     con = mysql.connect()
     cursor = con.cursor()
 
-    if request.method == 'POST':
-        
+    if request.method == 'POST':    
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('register'))
         if form.validate_on_submit():
@@ -388,7 +376,6 @@ def register():
                 str(form.username.data), 
                 str(form.password.data), 
                 str(form.userLevel.data), 
-            
                 )
             try:
                 sql = "INSERT INTO Employee (name, username, password, level) VALUES (%s, %s, %s, %s)"
@@ -400,8 +387,8 @@ def register():
             except Exception as e:
                 flash("Problem inserting into db: " + str(e))
                 return redirect(url_for('register'))
-
     return render_template('register.html', form=form, error=error, user=user_)
+
 
 @app.route('/addFunctionalArea', methods=['GET','POST'])
 def addFunctionalArea():
@@ -412,7 +399,6 @@ def addFunctionalArea():
     add_function_error = None
     error = None
     form = addFuncAreaForm(request.form)
-    #newArea = (str(form.area.data))
        
     con = mysql.connect()
     cursor = con.cursor()
@@ -423,8 +409,7 @@ def addFunctionalArea():
  
     programList = [(0,'')] + [(i[0], (programStr % i[1:4])) for i in programs]    
     form.program.choices = programList
-    
-        
+     
     if request.method == 'POST':
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('addFunctionalArea'))
@@ -435,18 +420,16 @@ def addFunctionalArea():
                 sql = 'INSERT INTO FunctionalArea(areaName, programId) VALUES (%s, %s)'
                 res = cursor.execute(sql, newProgram)
                 con.commit()
-                flash('New Function Added.')
+                flash('New Functional Area Added.')
                 return redirect(url_for('addFunctionalArea'))
             except Exception as e:
                 print(e, file=sys.stderr)
                 error = 'Invalid entry, please try again.'
                 
-                flash("Invalid entry, please try again.",add_function_error)
+                flash("Cannot add new functional area without program.",add_function_error)
                 return redirect(url_for('addFunctionalArea'))
     
     return render_template('addFunctionalArea.html', form=form,error=error, add_function_error=add_function_error)
-
-
 
 
 @app.route('/addProgram', methods=['GET', 'POST'])
@@ -484,9 +467,6 @@ def addProgram():
     return render_template('addProgram.html', form=form, error=error)
 
 
-
-
-
 @app.route('/search/', methods=['GET', 'POST'])
 def search():
     if user_.level == 0:
@@ -505,9 +485,7 @@ def search():
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
-
     employees = ((-1,''),) + cursor.fetchall()
-
     form.reportedBy.choices = employees
     form.assignedTo.choices = employees
     form.resolvedBy.choices = employees
@@ -524,7 +502,6 @@ def search():
                 "programId" : str(form.program.data),
                 "reportType" : str(form.reportType.data),
                 "severity" : str(form.severity.data),
-                #"areaName" : str(form.areaName.data),
                 "assignedTo" : str(form.assignedTo.data),
                 "status" : str(form.status.data),
                 "priority" : str(form.priority.data),
@@ -544,7 +521,7 @@ def search():
             reports = cursor.fetchall()
 
             if not reports:
-                flash("No bug reports match your search")
+                flash("No bug reports match your search", 'warning')
                 print("no bug reports match your search")
             else:
                 changedReports = []
@@ -558,9 +535,6 @@ def search():
 
     return render_template('search.html', form=form, error=error, user=user_)
 
-#@app.route('/results/')
-#def results():
-#    return render_template("results.html")
 
 @app.route('/bug_report/', methods=['GET', 'POST'])
 def bug_report():
@@ -579,55 +553,20 @@ def bug_report():
     programList = [(i[0], (programStr % i[1:4])) for i in programs]
 
     form.program.choices = programList
-
-    #get funtional area and pass to select list
-#    sql = "SELECT areaName FROM FunctionalArea"
-#    cursor.execute(sql)
-#    funcAreaList=[]
-#    for i,j in enumerate(cursor.fetchall()):
-#        funcAreaList.append((i,str(j[0])))
-#    form.areaName.choices = funcAreaList
-    #end functionalArea
-   
-#    sql = "SELECT * FROM FunctionalArea"
-#    cursor.execute(sql)
-#    areas = cursor.fetchall()
-#    areas_list=[(str(i[0]), str(i[0])) for i in areas]
-#    form.areaName.choices = areas_list
     
     sql = "SELECT employeeId, name FROM Employee"
     cursor.execute(sql)
-
     employees = cursor.fetchall()
-
     form.reportedBy.choices = employees
-
     employeesOptional = ((-1,''),) + employees
     form.assignedTo.choices = employeesOptional
     form.resolvedBy.choices = employeesOptional
     form.testedBy.choices = employeesOptional
 
-    #sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'bughound' AND TABLE_NAME = 'BugReport'"
-    #cursor.execute(sql)
-    #id = cursor.fetchone()[0]
-    #print(id)
-
-    #if  request.method == 'GET':
-    #   return render_template('bug_report.html', form=form, error=error)
     if request.method == 'POST':
         if 'cancel' == request.form.get('cancel'):
             return redirect(url_for('bug_report'))
         if form.validate_on_submit():
-            print("good!")
-            #f = form.attachment.data
-            #f.save(os.path.join(app.instance_path, 'temp_file/', f.filename))
-
-            #attachment = (
-            #        str(id),
-            #        str(f.filename), 
-            #        read_file(os.path.join('temp_file/',f.filename))
-            #        )
-
             reproducable = int(str(form.reproducable.data) == 'True')
             deferred = int(str(form.deferred.data) == 'True')
             bugReportData = [
@@ -660,49 +599,20 @@ def bug_report():
             reportString = ''.join("{}, ".format(val) for val in bugReportData)
             reportString = reportString[:-2]
             try:
-                #sql = "INSERT INTO BugReport (programId, reportType, severity, summary, \
-                #    reproducable, description, suggestedFix, reportedBy, discoveredDate, \
-                #    assignedTo, comments, status, priority, resolution, \
-                #    resolutionVersion, resolvedBy, resolvedDate, testedBy, testedDate, \
-                #    deferred) \
-                #    VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                 sql = "INSERT INTO BugReport VALUES (" + reportString + ")"
                 print(sql)
                 cursor.execute(sql)
                 con.commit()
-                #sql = "INSERT INTO Attachment (reportId, fileName, file) VALUES (%s, %s, %s)"
-                #cursor.execute(sql, attachment)
-                #con.commit()
+
                 print('New Bug Report added')
 
                 return redirect(url_for('search'))
             except Exception as e:
                 print("Problem inserting into db: " + str(e))
-                #os.remove(os.path.join('temp_file/',f.filename))
                 return redirect(url_for('bug_report'))
-                
-                #clean file
-            #os.remove(os.path.join('temp_file/',f.filename))
-            #con.close()  
         else:
             print("bad!")
     return render_template('bug_report.html', form=form, error=error, user=user_)
-
-'''
-@app.route('/_get_program_info/')
-def _get_program_info():
-    programName = request.args.get('programName', '01', type=str)
-    print(programName)
-    con = mysql.connect()
-    cursor = con.cursor()
-    sql = "SELECT version, releaseNumber FROM Program WHERE name = %s"
-    cursor.execute(sql, str(programName))
-    info = cursor.fetchall()
-    print(info)
-    return jsonify(info)
-'''
-
-
 
 
 @app.route('/upload')
@@ -756,6 +666,7 @@ def upload(report):
     else: flash('nothing')
     return render_template('upload.html', user=user_)
 
+
 '''
 Select all from the attachment table and place
 results in a table in attachments.html.
@@ -772,6 +683,7 @@ def attachments():
     except Exception as e:
         flash("Problem getting files: " + str(e))
     return render_template('attachments.html', results=results, user=user_)
+
 
 '''
 When a file gets selected in attachments.html
@@ -803,16 +715,12 @@ def showFile(report,file):
     file_ = results[0][1]
     
     if results[0][1].lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-#        res.append(base64.decodestring(results[0][2]))
         res.append(results[0][1])
     else:
         path = 'app/static/'+file_
         text = open(path, 'r+')
         res.append(text.read())
-        text.close()
-    
-#    res.append(os.path.join('temp_file/',results[0][1]))
-    
+        text.close()    
     return render_template('view_attachment.html', res=res, results=results, user=user_)
 
 
@@ -832,7 +740,6 @@ def read_file(filename):
     with open(filename, 'rb') as f:
         dat = f.read()
     return dat
-
 
 
 @app.route('/export/', methods=['GET', 'POST'])
@@ -882,10 +789,4 @@ def export():
         tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
         return tablesJSON
 
-
-                
-
     return render_template('export.html', form=form, error=error, user=user_)
-
-    
-    
