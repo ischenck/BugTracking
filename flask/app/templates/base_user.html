@@ -26,11 +26,21 @@
         <li><a href="{{url_for('export')}}">JSON Export</a></li>
   
         
-        <li><a href="{{url_for('search')}}">Search</a></li>  
+        <li><a href="{{url_for('search')}}">Search Bug Reports</a></li>  
         <li><a href="{{url_for('logout')}}">Logout</a></li>
 
       </ul> 
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-warning alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+  {{message}}
+  </div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 {% endblock %}

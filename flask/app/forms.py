@@ -16,7 +16,6 @@ class LoginForm(FlaskForm):
 class SearchForm(FlaskForm):
     program = SelectField('Program', validators=[Optional()], coerce=int
         )
-
     reportType = SelectField("Report Type", choices=[(-1,''), (1, "Coding Error"), 
         (2, "Suggestion"), (3, "Documentation"), 
         (4, "Hardware"), (5, "Query")
@@ -51,6 +50,7 @@ class SearchForm(FlaskForm):
     resolvedBy = SelectField("Resolved By", validators=[Optional()], coerce=int
         )
 
+
 class BugReportForm(FlaskForm):
     program = SelectField('Program', validators=[InputRequired()], coerce=int
         )
@@ -76,8 +76,6 @@ class BugReportForm(FlaskForm):
         )
     discoveredDate = DateField('Discovered Date', default=date.today
         )
-    
-        
     assignedTo = SelectField('Assigned To', validators=[Optional()], coerce=int
         )
     comments = TextAreaField("comments", validators=[Optional(), Length(min=1, max=400)]
@@ -109,7 +107,6 @@ class BugReportForm(FlaskForm):
     deferred = BooleanField("Deferred"
         )
 
-    #attachment = FileField("Attachment", validators=[FileRequired()])
 
 class EditForm(FlaskForm):
     name = StringField(
@@ -128,6 +125,7 @@ class EditForm(FlaskForm):
         validators=[NumberRange(1, 4, "User Level must be between 1 and 4")]
     )
     
+
 class RegisterForm(FlaskForm):
     name = StringField(
         'Name',
@@ -145,18 +143,18 @@ class RegisterForm(FlaskForm):
         validators=[NumberRange(1, 4, "User Level must be between 1 and 4")]
     )
     
+
 class addFuncAreaForm(FlaskForm):
     program = SelectField('Program', validators=[Optional()], coerce=int)
     area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
     
+
 class editFuncAreaForm(FlaskForm):
-    program = StringField('Program', validators=[DataRequired(), Length(min=1, max = 40)])
+    program = SelectField('Program', validators=[Optional()], coerce=int)
     area = StringField('Functional Area', validators=[DataRequired(), Length(min=1, max = 40)])
 
 
 class addProgramForm(FlaskForm):
-    #programID = IntegerField(
-    #        'programId', validators = [DataRequired()])
     name = StringField(
             'name', validators = [DataRequired(), Length(min=1, max=40)])
     version = IntegerField(
@@ -173,4 +171,3 @@ class ExportForm(FlaskForm):
     functionalArea = BooleanField('Functional Area')
     program = BooleanField('Program')
     attachment = BooleanField('Attachment')
-

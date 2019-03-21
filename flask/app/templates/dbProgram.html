@@ -6,18 +6,26 @@
 
 
 <div class="container">
+        <h3>Choose a Program to Edit</h3>
+
 <table class="table table-bordered">
+<tr>
+        <td><b>ID</b></td>
+        <td><b>Name</b></td>
+        <td><b>Version</b></td>
+        <td><b>Release Number</b></td>
+        <td></td>
+    </tr>
 {% for row in results %}
       
     <tr>
-        <td>
-        <a href="{{ url_for('editProgram', id=row[0]) }}">{{ row[0] }}</a>
-        </td>
+        <td>{{ row[0] }}</td>
          <td>{{ row[1] }}</td>
          <td>{{ row[2] }}</td>
          <td>{{ row[3] }}</td>
-         <td>{{ row[4] }}</td>
-         <td>{{ row[5] }}</td>
+         <td>       
+         <a href="{{ url_for('editProgram', id=row[0]) }}">Edit</a>
+         </td>
          
     </tr>
       
