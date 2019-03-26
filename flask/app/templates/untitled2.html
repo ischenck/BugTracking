@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 26 13:15:01 2019
+
+@author: fastg
+"""
+
+{% if user.level == 1 %}
+{% extends "base_user.html" %}
+{% endif %}
+{% if user.level == 2 %}
+{% extends "base.html" %}
+{% endif %}
+
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block content %}
+
+<div class="container">
+<div class="row align-items center justify-content-center">
+<div class="col-md-4">
+<h3>Export Database Tables</h3>
+
+<div class="form-group">
+  <form method="POST" action="/export/" role="form">
+   {{ form.csrf_token }}
+   <table class="table">
+    <tbody>
+        <tr>
+            <td>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Bug Report</span>
+                        </div>
+                        
+                        {{ form.bugReport(placeholder="bugReport") }}
+                        {% if form.bugReport.errors %}
+                            <span class="error">
+                            {% for error in form.bugReport.errors %}
+                                {{ error }}
+                            {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            <tr>                
+            <td>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Employee</span>
+                        </div>
+                        
+                        {{ form.employee(placeholder="employee") }}
+                        {% if form.employee.errors %}
+                            <span class="error">
+                            {% for error in form.employee.errors %}
+                                {{ error }}
+                            {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+            <td>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Functional Area</span>
+                        </div>
+                        
+                        {{ form.functionalArea(placeholder="functionalArea") }}
+                        {% if form.functionalArea.errors %}
+                            <span class="error">
+                            {% for error in form.functionalArea.errors %}
+                                {{ error }}
+                            {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+            <td>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Program</span>
+                        </div>
+                        
+                        {{ form.program(placeholder="program") }}
+                        {% if form.program.errors %}
+                            <span class="error">
+                            {% for error in form.program.errors %}
+                                {{ error }}
+                            {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Attachment</span>
+                            </div>
+                            
+                            {{ form.attachment(placeholder="attachment") }}
+                            {% if form.attachment.errors %}
+                                <span class="error">
+                                {% for error in form.attachment.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </td>
+
+
+        </tr>
+    </tbody>
+   </table>
+
+   <button class="btn btn-sm btn-success" type="submit">Request JSON Exports</button>
+
+  </form>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}
