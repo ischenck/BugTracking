@@ -12,6 +12,11 @@ from collections import defaultdict
 from xml.dom.minidom import parseString 
 from xml.dom import minidom
 import dicttoxml
+import pandas as pd
+import requests 
+
+
+
 
 
 mysql = MySQL()
@@ -798,9 +803,38 @@ def export():
         if not tables:
             flash("No tables selected")
         else:
-            tablesJSON = jsonify(tables)
-            tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
-            return tablesJSON
+            string =''.join(str(e) for e in tables)
+            #data = json.dumps(tables, indent = 1)
+            #dataArr = bytes(data, 'ascii')
+            #ascii = data.encode('ascii')
+            
+            #again = [ord(c) for c in data]
+            
+            #print(again)
+            
+            #print(ascii)
+            with open('ascii.txt', 'w') as f:
+                f.write(string)
+                
+            f.close()
+            flash("Success!")
+            #print(dataArr)
+            
+            #input("please!")
+            #f = open("ascii.txt", "wb")
+            #f.write(dataArr)
+            #f.close()
+            #flash("success")
+            
+            
+            #tablesJSON = jsonify(tables)
+           # input("wait This one!")
+            #data = json.dumps(tablesJSON)
+            #print(data)
+            #input("wait")
+            
+            #tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+            #return tablesJSON
 
     return render_template('export.html', form=form, error=error, user=user_)
 
@@ -901,13 +935,14 @@ def exportXML():
         else:
             xml = dicttoxml.dicttoxml(tables)
             dom = parseString(xml)
-            
             f = open("tablexml.xml", "w")
             dom.writexml(f)
             f.close()
             flash("success")
             #tablesJSON = jsonify(xml)
            # tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+           
+           
             
             #return tablesJSON
 
