@@ -14,7 +14,7 @@
 <h3>Export Database Tables</h3>
 
 <div class="form-group">
-  <form method="POST" action="/export/" role="form">
+  <form method="POST" action="/exportXML/" role="form">
    {{ form.csrf_token }}
    <table class="table">
     <tbody>
@@ -113,7 +113,7 @@
     </tbody>
    </table>
 
-   <button class="btn btn-sm btn-success" type="submit">Request ASCII Exports</button>
+   <button class="btn btn-sm btn-success" type="submit">Request XML Exports</button>
 
   </form>
 </div>

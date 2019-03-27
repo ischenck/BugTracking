@@ -8,12 +8,23 @@ import os, sys, gzip
 import base64
 from app.user_object import User
 import json
+from collections import defaultdict
+from xml.dom.minidom import parseString 
+from xml.dom import minidom
+import dicttoxml
+import pandas as pd
+import requests 
+
+
+
+
+
 mysql = MySQL()
 
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'system'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'bughound'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -792,8 +803,147 @@ def export():
         if not tables:
             flash("No tables selected")
         else:
-            tablesJSON = jsonify(tables)
-            tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
-            return tablesJSON
+            string =''.join(str(e) for e in tables)
+            #data = json.dumps(tables, indent = 1)
+            #dataArr = bytes(data, 'ascii')
+            #ascii = data.encode('ascii')
+            
+            #again = [ord(c) for c in data]
+            
+            #print(again)
+            
+            #print(ascii)
+            with open('ascii.txt', 'w') as f:
+                f.write(string)
+                
+            f.close()
+            flash("Success!")
+            #print(dataArr)
+            
+            #input("please!")
+            #f = open("ascii.txt", "wb")
+            #f.write(dataArr)
+            #f.close()
+            #flash("success")
+            
+            
+            #tablesJSON = jsonify(tables)
+           # input("wait This one!")
+            #data = json.dumps(tablesJSON)
+            #print(data)
+            #input("wait")
+            
+            #tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+            #return tablesJSON
 
     return render_template('export.html', form=form, error=error, user=user_)
+
+@app.route('/exportXML/', methods=['GET', 'POST'])
+def exportXML():
+    if user_.level == 0:
+        return redirect(url_for('login'))
+    
+    error = None
+    form = ExportForm(request.form)
+    
+    if request.method == 'POST':
+        con = mysql.connect()
+        cursor = con.cursor()
+        tables = defaultdict(list)
+        if form.bugReport.data:
+            sql = "SELECT * FROM BugReport"
+            cursor.execute(sql)
+            bugReportTable = cursor.fetchall()
+            
+            firstColumn = [x[0] for x in bugReportTable]
+            listFirstColumn = [str(item) for item in firstColumn]
+            listbugReportTable = list(bugReportTable)
+            
+            for i in range(len(firstColumn)):
+                tables[listFirstColumn[i]].append(listbugReportTable[i])
+                
+           # print(tables)
+           # input("bugReport")
+            #tables.append(bugReportTable)
+
+        if form.employee.data:
+            sql = "SELECT * FROM Employee"
+            cursor.execute(sql)
+            employeeTable = cursor.fetchall()
+            
+            firstColumn = [x[0] for x in employeeTable]
+            listFirstColumn = [str(item) for item in firstColumn]
+            listemployeeTable = list(employeeTable)
+            
+            for i in range(len(firstColumn)):
+                tables[listFirstColumn[i]].append(listemployeeTable[i])
+            #tables.append(employeeTable)
+            
+            #print(tables)
+            #input("emp")
+
+        if form.functionalArea.data:
+            sql = "SELECT * FROM FunctionalArea"
+            cursor.execute(sql)
+            functionalAreaTable = cursor.fetchall()
+            
+            firstColumn = [x[0] for x in functionalAreaTable]
+            listFirstColumn = [str(item) for item in firstColumn]
+            listfunctionalAreaTable = list(functionalAreaTable)
+            
+            for i in range(len(firstColumn)):
+                tables[listFirstColumn[i]].append(listfunctionalAreaTable[i])
+           # tables.append(functionalAreaTable)
+           
+            #print(tables)
+            #input("FA")
+        #works   
+        if form.program.data:
+            sql = "SELECT * FROM Program"
+            cursor.execute(sql)
+            programTable = cursor.fetchall()
+            
+            firstColumn = [x[0] for x in programTable]
+            listFirstColumn = [str(item) for item in firstColumn]
+            listProgramTable = list(programTable)
+            
+            for i in range(len(firstColumn)):
+                tables[listFirstColumn[i]].append(listProgramTable[i])
+        
+        #print(tables)
+        #input("program Tables")
+        
+
+        if form.attachment.data:
+            sql = "SELECT reportID, fileName From Attachment"
+            cursor.execute(sql)
+            attachmentTable = cursor.fetchall()
+            
+            firstColumn = [x[0] for x in attachmentTable]
+            listFirstColumn = [str(item) for item in firstColumn]
+            listattachmentTable = list(attachmentTable)
+            
+            for i in range(len(firstColumn)):
+                tables[listFirstColumn[i]].append(listattachmentTable[i])
+            #tables.append(attachmentTable)
+            
+            #print(tables)
+           # input("A")
+
+        if not tables:
+            flash("No tables selected")
+        else:
+            xml = dicttoxml.dicttoxml(tables)
+            dom = parseString(xml)
+            f = open("tablexml.xml", "w")
+            dom.writexml(f)
+            f.close()
+            flash("success")
+            #tablesJSON = jsonify(xml)
+           # tablesJSON.headers['Content-Disposition'] = 'attachment;filename=tables.json'
+           
+           
+            
+            #return tablesJSON
+
+    return render_template('exportXML.html', form=form, error=error, user=user_)
